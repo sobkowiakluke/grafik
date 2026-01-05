@@ -7,15 +7,16 @@ class EmployeeService:
     # -----------------------
     # Pracownicy
     # -----------------------
-    def add_employee(self, first_name: str, last_name: str, position: str, role_id: int = None):
+    def add_employee(self, first_name: str, last_name: str, role_id: int = None, active: int = 1):
         cur = self.db.cursor()
         query = """
-        INSERT INTO employees (first_name, last_name, position, role_id)
+        INSERT INTO employees (first_name, last_name, role_id, active)
         VALUES (%s, %s, %s, %s)
         """
-        cur.execute(query, (first_name, last_name, position, role_id))
+        cur.execute(query, (first_name, last_name, role_id, active))
         cur.close()
-        print(f"Dodano pracownika: {first_name} {last_name} (rola id={role_id})")
+        print(f"Dodano pracownika: {first_name} {last_name} (rola id={role_id}, active={active})")
+
 
     def delete_employee(self, employee_id: int):
         cur = self.db.cursor()
@@ -27,7 +28,7 @@ class EmployeeService:
     def get_employee(self, employee_id: int):
         cur = self.db.cursor()
         query = """
-        SELECT e.id, e.first_name, e.last_name, e.position, r.name AS role
+        SELECT e.id, e.first_name, e.last_name, e.active, r.name AS role
         FROM employees e
         LEFT JOIN roles r ON e.role_id = r.id
         WHERE e.id = %s
@@ -40,7 +41,7 @@ class EmployeeService:
     def list_employees(self):
         cur = self.db.cursor()
         query = """
-        SELECT e.id, e.first_name, e.last_name, e.position, r.name AS role
+        SELECT e.id, e.first_name, e.last_name, e.active, r.name AS role
         FROM employees e
         LEFT JOIN roles r ON e.role_id = r.id
         ORDER BY e.id
@@ -49,6 +50,34 @@ class EmployeeService:
         result = cur.fetchall()
         cur.close()
         return result
+
+    def update_employee(self, employee_id: int, first_name: str = None, last_name: str = None, role_id: int = None, active: int = None):
+        cur = self.db.cursor()
+        fields = []
+        values = []
+
+        if first_name:
+            fields.append("first_name = %s")
+            values.append(first_name)
+        if last_name:
+            fields.append("last_name = %s")
+            values.append(last_name)
+        if role_id:
+            fields.append("role_id = %s")
+            values.append(role_id)
+        if active is not None:
+            fields.append("active = %s")
+            values.append(active)
+
+        if not fields:
+            print("Brak zmian do zapisania.")
+            return
+
+        values.append(employee_id)
+        query = f"UPDATE employees SET {', '.join(fields)} WHERE id = %s"
+        cur.execute(query, values)
+        cur.close()
+        print(f"Zaktualizowano pracownika o ID {employee_id}")
 
     # -----------------------
     # Role
