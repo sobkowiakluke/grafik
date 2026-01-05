@@ -11,6 +11,7 @@ def main():
         print("3. Lista wszystkich pracowników")
         print("4. Pokaż pracownika po ID")
         print("5. Lista ról")
+        print("6. Edytuj pracownika")
         print("0. Wyjście")
 
         choice = input("Wybierz opcję: ").strip()
@@ -18,16 +19,19 @@ def main():
         if choice == "1":
             first_name = input("Imię: ").strip()
             last_name = input("Nazwisko: ").strip()
-            position = input("Stanowisko: ").strip()
 
+            # wybór aktywności
+            active_input = input("Czy pracownik aktywny? (1 = tak, 0 = nie, domyślnie 1): ").strip()
+            active = int(active_input) if active_input in ("0", "1") else 1
+
+            # wybór roli
             print("\nDostępne role:")
             roles = service.list_roles()
             print(tabulate(roles, headers="keys", tablefmt="grid"))
+            role_input = input("Wybierz ID roli: ").strip()
+            role_id = int(role_input) if role_input.isdigit() else None
 
-            role_id = input("Wybierz ID roli: ").strip()
-            role_id = int(role_id) if role_id.isdigit() else None
-
-            service.add_employee(first_name, last_name, position, role_id)
+            service.add_employee(first_name, last_name, role_id, active)
 
         elif choice == "2":
             emp_id = input("ID pracownika do usunięcia: ").strip()
@@ -57,9 +61,32 @@ def main():
             else:
                 print("Brak ról w systemie.")
 
+        elif choice == "6":
+            emp_id = input("ID pracownika do edycji: ").strip()
+            emp_id = int(emp_id)
+
+            first_name = input("Nowe imię (Enter = bez zmiany): ").strip()
+            last_name = input("Nowe nazwisko (Enter = bez zmiany): ").strip()
+
+            print("\nDostępne role:")
+            roles = service.list_roles()
+            print(tabulate(roles, headers="keys", tablefmt="grid"))
+            role_input = input("ID nowej roli (Enter = bez zmiany): ").strip()
+            role_id = int(role_input) if role_input.isdigit() else None
+
+            active_input = input("Czy pracownik aktywny? (1 = tak, 0 = nie, Enter = bez zmiany): ").strip()
+            active = int(active_input) if active_input in ("0", "1") else None
+
+            service.update_employee(emp_id,
+                                    first_name=first_name if first_name else None,
+                                    last_name=last_name if last_name else None,
+                                    role_id=role_id,
+                                    active=active)
+
         elif choice == "0":
             print("Koniec programu")
             break
+
         else:
             print("Nieprawidłowa opcja. Spróbuj ponownie.")
 
