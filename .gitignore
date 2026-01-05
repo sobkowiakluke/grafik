@@ -1,2 +1,9 @@
 # Database credentials
 app/db/config.py
+
+# virtual environment
+venv/
+
+# cache Pythona
+__pycache__/
+*/__pycache__/
