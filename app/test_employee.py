@@ -3,17 +3,22 @@ from app.services.employee_service import EmployeeService
 def main():
     service = EmployeeService()
 
-    # Dodajemy pracowników
-    service.add_employee("Jan", "Kowalski", "Kasjer")
-    service.add_employee("Anna", "Nowak", "Magazynier")
+    # Lista dostępnych ról
+    print("Role w systemie:")
+    for role in service.list_roles():
+        print(role)
+
+    # Dodajemy pracowników z rolami
+    service.add_employee("Jan", "Kowalski", "Kasjer", role_id=1)
+    service.add_employee("Anna", "Nowak", "Starszy kasjer", role_id=2)
 
     # Lista wszystkich
-    print("Lista pracowników:")
+    print("\nLista pracowników:")
     for emp in service.list_employees():
         print(emp)
 
     # Pobranie pracownika po ID
-    print("Pracownik o ID 1:")
+    print("\nPracownik o ID 1:")
     print(service.get_employee(1))
 
     # Usuwanie
