@@ -33,7 +33,7 @@ CREATE TABLE `employees` (
   PRIMARY KEY (`id`),
   KEY `fk_role` (`role_id`),
   CONSTRAINT `fk_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,15 +61,16 @@ DROP TABLE IF EXISTS `schedules`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `schedules` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `employee_id` int(11) NOT NULL,
-  `work_date` date NOT NULL,
-  `start_time` time NOT NULL,
-  `end_time` time NOT NULL,
-  `shift_name` varchar(50) DEFAULT NULL,
-  `note` varchar(255) DEFAULT NULL,
+  `year` smallint(6) NOT NULL,
+  `month` tinyint(4) NOT NULL,
+  `version` int(11) NOT NULL DEFAULT 1,
+  `start_datetime` datetime NOT NULL,
+  `end_datetime` datetime NOT NULL,
+  `status` enum('draft','approved','closed') NOT NULL DEFAULT 'draft',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `employee_id` (`employee_id`,`work_date`,`start_time`),
-  CONSTRAINT `schedules_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`)
+  UNIQUE KEY `uniq_year_month_version` (`year`,`month`,`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -82,4 +83,4 @@ CREATE TABLE `schedules` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-01-05 12:14:50
+-- Dump completed on 2026-01-06 15:35:52
