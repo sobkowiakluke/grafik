@@ -15,10 +15,22 @@ class ScheduleService:
         end_dt = datetime(year, month, last_day, 23, 59, 59)
 
         cur = self.db.cursor()
+
+        cur.execute(
+            "SELECT MAX(version) AS max_v FROM schedules WHERE year=%s AND month=%s",
+            (year, month)
+        )
+        row = cur.fetchone()
+
+        if row["max_v"] is None:
+            version = 1
+        else:
+            version = row["max_v"] + 1
+
         cur.execute(
             "INSERT INTO schedules (year, month, version, status, start_datetime, end_datetime) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
-            (year, month, 1, 'draft', start_dt, end_dt)
+            (year, month, version, 'draft', start_dt, end_dt)
         )
 
         schedule_id = cur.lastrowid  # <--- Pobranie ID nowego grafiku
