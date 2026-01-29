@@ -1,90 +1,59 @@
+from calendar import monthrange
+from datetime import datetime, timedelta
 from app.db.connection import Database
-import calendar
-from datetime import datetime
+from app.services.schedule_day_service import ScheduleDayService
+from datetime import date, datetime, timedelta
 
 class ScheduleService:
-    def __init__(self):
-        self.db = Database()
+    def __init__(self, db, day_service):
+        self.db = db
+        self.day_service = day_service
 
     def create_schedule(self, year: int, month: int):
+        last_day = monthrange(year, month)[1]  # liczba dni w miesiącu
+        start_dt = datetime(year, month, 1, 0, 0, 0)
+        end_dt = datetime(year, month, last_day, 23, 59, 59)
+
         cur = self.db.cursor()
-
-        # ustalenie zakresu miesiąca
-        last_day = calendar.monthrange(year, month)[1]
-        start_dt = f"{year}-{month:02d}-01 00:00:00"
-        end_dt = f"{year}-{month:02d}-{last_day} 23:59:59"
-
-        # ustalenie kolejnej wersji
         cur.execute(
-            "SELECT COALESCE(MAX(version), 0) + 1 AS next_version FROM schedules WHERE year=%s AND month=%s",
-            (year, month)
+            "INSERT INTO schedules (year, month, version, status, start_datetime, end_datetime) "
+            "VALUES (%s, %s, %s, %s, %s, %s)",
+            (year, month, 1, 'draft', start_dt, end_dt)
         )
-        version = cur.fetchone()["next_version"]
 
-        cur.execute(
-            """INSERT INTO schedules (year, month, version, start_datetime, end_datetime)
-               VALUES (%s, %s, %s, %s, %s)""",
-            (year, month, version, start_dt, end_dt)
-        )
+        schedule_id = cur.lastrowid  # <--- Pobranie ID nowego grafiku
+        self.db.commit()
+
+        # Tworzymy dni grafiku
+        for day_num in range(1, last_day + 1):
+            day_date = date(year, month, day_num)
+            self.day_service.add_day(schedule_id, day_date)
 
         cur.close()
-        print(f"Utworzono grafik: {year}-{month:02d}, wersja {version}")
+        print(f"Grafik dla {year}-{month:02d} został utworzony. ID grafiku: {schedule_id}")
+
+
+    def delete_schedule(self, schedule_id: int):
+        cur = self.db.cursor()
+        cur.execute("DELETE FROM schedule_days WHERE schedule_id=%s", (schedule_id,))
+        cur.execute("DELETE FROM schedules WHERE id=%s", (schedule_id,))
+        self.db.commit()
+        cur.close()
+        print("Grafik usunięty.")
 
     def list_schedules(self):
         cur = self.db.cursor()
         cur.execute(
-            """SELECT id, year, month, version, status, start_datetime, end_datetime
-               FROM schedules
-               ORDER BY year DESC, month DESC, version DESC"""
+            "SELECT id, year, month, version, status, start_datetime, end_datetime "
+            "FROM schedules ORDER BY year DESC, month DESC"
         )
-        data = cur.fetchall()
+        rows = cur.fetchall()
         cur.close()
-        return data
+        return rows
 
     def get_schedule(self, schedule_id: int):
         cur = self.db.cursor()
-        cur.execute(
-            "SELECT * FROM schedules WHERE id = %s",
-            (schedule_id,)
-        )
-        data = cur.fetchone()
+        cur.execute("SELECT * FROM schedules WHERE id=%s", (schedule_id,))
+        row = cur.fetchone()
         cur.close()
-        return data
-
-    def delete_schedule(self, schedule_id: int):
-        cur = self.db.cursor()
-        cur.execute("DELETE FROM schedules WHERE id = %s", (schedule_id,))
-        cur.close()
-        print(f"Usunięto grafik ID {schedule_id}")
-
-    def update_status(self, schedule_id: int, status: str):
-        if status not in ("draft", "approved", "archived"):
-            print("Nieprawidłowy status.")
-            return
-
-        cur = self.db.cursor()
-
-    # jeśli próbujemy ustawić approved
-        if status == "approved":
-        # sprawdzamy, czy w tym miesiącu już istnieje approved
-            cur.execute(
-                "SELECT id FROM schedules "
-                "WHERE year=(SELECT year FROM schedules WHERE id=%s) "
-                "AND month=(SELECT month FROM schedules WHERE id=%s) "
-                "AND status='approved'",
-                (schedule_id, schedule_id)
-            )
-            existing = cur.fetchone()
-            if existing:
-                print(f"Nie można zatwierdzić. Już istnieje approved grafiku ID {existing['id']}")
-                cur.close()
-                return
-
-    # aktualizacja statusu
-        cur.execute(
-            "UPDATE schedules SET status = %s WHERE id = %s",
-            (status, schedule_id)
-        )
-        cur.close()
-        print(f"Zmieniono status grafiku ID {schedule_id} na '{status}'")
-
+        return row

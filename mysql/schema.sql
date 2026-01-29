@@ -53,6 +53,25 @@ CREATE TABLE `roles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `schedule_days`
+--
+
+DROP TABLE IF EXISTS `schedule_days`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `schedule_days` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `schedule_id` int(11) NOT NULL,
+  `day` date NOT NULL,
+  `staff_from` time DEFAULT NULL,
+  `store_close` time DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_schedule_day` (`schedule_id`,`day`),
+  CONSTRAINT `schedule_days_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schedules`
 --
 
@@ -71,7 +90,7 @@ CREATE TABLE `schedules` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_year_month_version` (`year`,`month`,`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -83,4 +102,4 @@ CREATE TABLE `schedules` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-01-06 15:35:52
+-- Dump completed on 2026-01-07 18:34:02

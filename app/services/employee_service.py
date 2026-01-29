@@ -1,8 +1,51 @@
 from app.db.connection import Database
 
 class EmployeeService:
+
+
+
+
+
+
     def __init__(self):
         self.db = Database()
+
+
+    def update_first_name(self, employee_id: int, first_name: str):
+        cur = self.db.cursor()
+        cur.execute(
+            "UPDATE employees SET first_name=%s WHERE id=%s",
+            (first_name, employee_id)
+        )
+        self.db.commit()
+        cur.close()
+
+    def update_last_name(self, employee_id: int, last_name: str):
+        cur = self.db.cursor()
+        cur.execute(
+            "UPDATE employees SET last_name=%s WHERE id=%s",
+            (last_name, employee_id)
+        )
+        self.db.commit()
+        cur.close()
+
+    def update_role(self, employee_id: int, role_id: int):
+        cur = self.db.cursor()
+        cur.execute(
+            "UPDATE employees SET role_id=%s WHERE id=%s",
+            (role_id, employee_id)
+        )
+        self.db.commit()
+        cur.close()
+
+    def update_active(self, employee_id: int, active: bool):
+        cur = self.db.cursor()
+        cur.execute(
+            "UPDATE employees SET active=%s WHERE id=%s",
+            (1 if active else 0, employee_id)
+        )
+        self.db.commit()
+        cur.close()
 
     # -----------------------
     # Pracownicy
@@ -41,7 +84,7 @@ class EmployeeService:
     def list_employees(self):
         cur = self.db.cursor()
         query = """
-        SELECT e.id, e.first_name, e.last_name, e.active, r.name AS role
+        SELECT e.id, e.first_name, e.last_name, e.role_id, e.active, r.name AS role
         FROM employees e
         LEFT JOIN roles r ON e.role_id = r.id
         ORDER BY e.id
@@ -89,3 +132,11 @@ class EmployeeService:
         result = cur.fetchall()
         cur.close()
         return result
+
+    def get_role_name(self, role_id: int) -> str:
+        """Zwraca nazwę roli dla podanego role_id"""
+        cur = self.db.cursor()
+        cur.execute("SELECT name FROM roles WHERE id=%s", (role_id,))
+        row = cur.fetchone()
+        cur.close()
+        return row['name'] if row else "Nieznana"

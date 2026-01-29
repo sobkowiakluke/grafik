@@ -1,28 +1,17 @@
+from app.db.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 import mysql.connector
-from mysql.connector import Error
-from app.db.config import DB_CONFIG
-
 
 class Database:
     def __init__(self):
-        self.connection = None
-
-    def connect(self):
-        if self.connection and self.connection.is_connected():
-            return self.connection
-        try:
-            self.connection = mysql.connector.connect(
-                autocommit=True,
-                **DB_CONFIG
-            )
-            return self.connection
-        except Error as e:
-            raise RuntimeError(f"Błąd połączenia z bazą: {e}")
+        self.conn = mysql.connector.connect(
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
+        )
 
     def cursor(self):
-        return self.connect().cursor(dictionary=True)
+        return self.conn.cursor(dictionary=True)
 
-    def close(self):
-        if self.connection and self.connection.is_connected():
-            self.connection.close()
-            self.connection = None
+    def commit(self):
+        self.conn.commit()
