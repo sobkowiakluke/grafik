@@ -38,9 +38,7 @@ class ScheduleService:
 
         # Tworzymy dni grafiku
         for day_num in range(1, last_day + 1):
-            day_date = date(year, month, day_num)
-            self.day_service.add_day(schedule_id, day_date)
-
+            self.day_service.add_day(schedule_id, day_num)  # <-- przekazujemy INT
         cur.close()
         print(f"Grafik dla {year}-{month:02d} został utworzony. ID grafiku: {schedule_id}")
 

@@ -23,6 +23,7 @@ class ScheduleDayService:
             "INSERT INTO schedule_days (schedule_id, day) VALUES (%s, %s)",
             (schedule_id, day_number)
         )
+        self.db.commit()  # <- tutaj
         cur.close()
 
     def set_day_hours(self, day_number: int, schedule_id: int, staff_from: str, store_close: str):
