@@ -10,8 +10,10 @@ class Database:
             database=DB_NAME
         )
 
-    def cursor(self):
-        return self.conn.cursor(dictionary=True)
+    def cursor(self, **kwargs):
+        kwargs["dictionary"] = True
+        return self.conn.cursor(**kwargs)
+
 
     def commit(self):
         self.conn.commit()
