@@ -1,8 +1,7 @@
-from calendar import monthrange
-from datetime import datetime, timedelta
+from calendar import monthrange, weekday, SUNDAY
+from datetime import datetime, timedelta, date
 from app.db.connection import Database
 from app.services.schedule_day_service import ScheduleDayService
-from datetime import date, datetime, timedelta
 
 class ScheduleService:
     def __init__(self, db, day_service):
@@ -10,38 +9,37 @@ class ScheduleService:
         self.day_service = day_service
 
     def create_schedule(self, year: int, month: int):
-        last_day = monthrange(year, month)[1]  # liczba dni w miesiącu
+        last_day = monthrange(year, month)[1]
         start_dt = datetime(year, month, 1, 0, 0, 0)
         end_dt = datetime(year, month, last_day, 23, 59, 59)
 
         cur = self.db.cursor()
-
         cur.execute(
             "SELECT MAX(version) AS max_v FROM schedules WHERE year=%s AND month=%s",
             (year, month)
         )
         row = cur.fetchone()
-
-        if row["max_v"] is None:
-            version = 1
-        else:
-            version = row["max_v"] + 1
+        version = 1 if row["max_v"] is None else row["max_v"] + 1
 
         cur.execute(
             "INSERT INTO schedules (year, month, version, status, start_datetime, end_datetime) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
             (year, month, version, 'draft', start_dt, end_dt)
         )
-
-        schedule_id = cur.lastrowid  # <--- Pobranie ID nowego grafiku
+        schedule_id = cur.lastrowid
         self.db.commit()
 
-        # Tworzymy dni grafiku
+        # Dodajemy dni
         for day_num in range(1, last_day + 1):
-            self.day_service.add_day(schedule_id, day_num)  # <-- przekazujemy INT
+            if weekday(year, month, day_num) == SUNDAY:
+                # Niedziele wolne
+                self.day_service.add_day(schedule_id, day_num, None, None)
+            else:
+                # Pozostałe dni domyślnie 05:00 - 23:00
+                self.day_service.add_day(schedule_id, day_num, '05:00:00', '23:00:00')
+
         cur.close()
         print(f"Grafik dla {year}-{month:02d} został utworzony. ID grafiku: {schedule_id}")
-
 
     def delete_schedule(self, schedule_id: int):
         cur = self.db.cursor()

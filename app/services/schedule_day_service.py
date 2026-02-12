@@ -13,22 +13,18 @@ class ScheduleDayService:
     def __init__(self, db: Database):
         self.db = db
 
-
-    def add_day(self, schedule_id: int, day_number: int):
+    def add_day(self, schedule_id: int, day_number: int, staff_from: str = None, store_close: str = None):
         """
-        Dodaje nowy rekord dnia do tabeli schedule_days dla danego grafiku.
-        day_number: liczba dnia miesiąca (1..31)
-        Domyślnie ustawiamy godziny 05:00 - 23:00
+        Dodaje nowy rekord dnia do tabeli schedule_days.
+        Jeśli staff_from/store_close to None → dzień wolny.
         """
         cur = self.db.cursor()
         cur.execute(
-            "INSERT INTO schedule_days (schedule_id, day, staff_from, store_close) VALUES (%s, %s, %s, %s)",
-            (schedule_id, day_number, '05:00', '23:00')
+             "INSERT INTO schedule_days (schedule_id, day, staff_from, store_close) VALUES (%s, %s, %s, %s)",
+             (schedule_id, day_number, staff_from, store_close)
         )
         self.db.commit()
         cur.close()
-
-
 
     def set_day_hours(self, day_number: int, schedule_id: int, staff_from: str, store_close: str):
         cur = self.db.cursor()
