@@ -73,7 +73,7 @@ def edit_schedule_menu(schedule_id):
             day_number = int(input("Dzień miesiąca: "))
             staff_from = input("Załoga od (HH:MM): ")
             store_close = input("Zamknięcie sklepu (HH:MM): ")
-            day_service.set_day_hours(schedule_id, day_number, staff_from, store_close)
+            day_service.set_day_hours(day_number, schedule_id, staff_from, store_close)
             print("Godziny dnia zapisane")
         elif choice == "3":
             day_number = int(input("Dzień miesiąca: "))

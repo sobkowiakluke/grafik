@@ -27,10 +27,6 @@ class ScheduleDayService:
         cur.close()
 
     def set_day_hours(self, day_number: int, schedule_id: int, staff_from: str, store_close: str):
-        """
-        Ustawia godziny pracy dla danego dnia grafiku.
-        staff_from i store_close to string w formacie 'HH:MM'.
-        """
         cur = self.db.cursor()
         cur.execute(
             "UPDATE schedule_days "
@@ -38,6 +34,7 @@ class ScheduleDayService:
             "WHERE schedule_id=%s AND day=%s",
             (staff_from, store_close, schedule_id, day_number)
         )
+        self.db.commit()
         cur.close()
         print(f"Dzień {day_number} zaktualizowany: {staff_from} → {store_close}")
 
@@ -52,6 +49,7 @@ class ScheduleDayService:
             "WHERE schedule_id=%s AND day=%s",
             (schedule_id, day_number)
         )
+        self.db.commit()
         cur.close()
         print(f"Dzień {day_number} ustawiony jako wolny")
 
@@ -73,9 +71,25 @@ class ScheduleDayService:
         print("\n+----+----------+----------+")
         print("| Dzień | Od       | Do       |")
         print("+====+==========+==========+")
+
         for r in rows:
             if r["staff_from"] is None:
                 print(f"| {r['day']:>4} | WOLNE   | WOLNE   |")
             else:
-                print(f"| {r['day']:>4} | {r['staff_from']:<8} | {r['store_close']:<8} |")
+                # r['staff_from'] i r['store_close'] są timedelta, konwertujemy
+                staff_from_td = r["staff_from"]
+                store_close_td = r["store_close"]
+
+                # funkcja pomocnicza konwertująca timedelta -> HH:MM
+                def td_to_hhmm(td):
+                    total_seconds = int(td.total_seconds())
+                    hours = total_seconds // 3600
+                    minutes = (total_seconds % 3600) // 60
+                    return f"{hours:02d}:{minutes:02d}"
+
+                staff_from_str = td_to_hhmm(staff_from_td)
+                store_close_str = td_to_hhmm(store_close_td)
+
+                print(f"| {r['day']:>4} | {staff_from_str:<8} | {store_close_str:<8} |")
+
         print("+----+----------+----------+")
