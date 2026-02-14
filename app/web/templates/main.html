@@ -163,7 +163,7 @@
         item.addEventListener('click', () => {
             // Specjalnie dla Listy Pracowników
             if (item.id === 'list-employees') {
-                mainContent.innerHTML = `<iframe src="/employee/list" style="width:100%; height:100%; border:none;"></iframe>`;
+                mainContent.innerHTML = `<iframe src="/employees/list" style="width:100%; height:100%; border:none;"></iframe>`;
             } else {
                 mainContent.innerHTML = `<h2>${item.innerText}</h2><p>Tu pojawi się formularz / tabela dla "${item.innerText}".</p>`;
             }

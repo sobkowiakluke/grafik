@@ -1,32 +1,23 @@
-{% extends "main.html" %}
-{% block content %}
+<!-- app/web/templates/employee_list.html -->
 <h2>Lista pracowników</h2>
-<a href="{{ url_for('employee_add') }}">Dodaj pracownika</a>
-<table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Imię</th>
-            <th>Nazwisko</th>
-            <th>Rola</th>
-            <th>Aktywny</th>
-            <th>Akcje</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for e in employees %}
-        <tr>
-            <td>{{ e.id }}</td>
-            <td>{{ e.first_name }}</td>
-            <td>{{ e.last_name }}</td>
-            <td>{{ e.role }}</td>
-            <td>{{ 'Tak' if e.active else 'Nie' }}</td>
-            <td>
-                <a href="{{ url_for('employee_edit', employee_id=e.id) }}">Edytuj</a> |
-                <a href="{{ url_for('employee_delete', employee_id=e.id) }}" onclick="return confirm('Na pewno usunąć?')">Usuń</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+<table border="1" style="width:100%;">
+    <tr>
+        <th>ID</th>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Rola</th>
+        <th>Akcje</th>
+    </tr>
+    {% for emp in employees %}
+    <tr>
+        <td>{{ emp.id }}</td>
+        <td>{{ emp.first_name }}</td>
+        <td>{{ emp.last_name }}</td>
+        <td>{{ emp.role_name or 'Brak' }}</td>
+        <td>
+            <button>Edit</button>
+            <button>Usuń</button>
+        </td>
+    </tr>
+    {% endfor %}
 </table>
-{% endblock %}
