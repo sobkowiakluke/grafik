@@ -127,6 +127,7 @@
             <div class="menu-section">
                 <h3>Pracownicy</h3>
                 <ul>
+                    <li id="list-employees">Lista pracowników</li>
                     <li id="add-employee">Dodawanie</li>
                     <li id="delete-employee">Usuwanie</li>
                     <li id="edit-employee">Modyfikowanie</li>
@@ -154,14 +155,22 @@
         Planeiro wersja: 0.5
     </footer>
 
-    <script>
-        // Tymczasowy JS do zmiany treści w content po kliknięciu w menu
-        const mainContent = document.getElementById('main-content');
-        document.querySelectorAll('.sidebar li').forEach(item => {
-            item.addEventListener('click', () => {
+<script>
+    const mainContent = document.getElementById('main-content');
+
+    // Obsługa kliknięć w menu
+    document.querySelectorAll('.sidebar li').forEach(item => {
+        item.addEventListener('click', () => {
+            // Specjalnie dla Listy Pracowników
+            if (item.id === 'list-employees') {
+                mainContent.innerHTML = `<iframe src="/employee/list" style="width:100%; height:100%; border:none;"></iframe>`;
+            } else {
                 mainContent.innerHTML = `<h2>${item.innerText}</h2><p>Tu pojawi się formularz / tabela dla "${item.innerText}".</p>`;
-            });
+            }
         });
-    </script>
+    });
+</script>
+
+
 </body>
 </html>

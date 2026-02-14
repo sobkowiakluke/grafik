@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+<h2>Edytuj pracownika</h2>
+<form method="post" action="{{ url_for('employee_edit', employee_id=employee.id) }}">
+    <label>Imię:<br>
+        <input type="text" name="first_name" value="{{ employee.first_name }}" required>
+    </label><br><br>
+    <label>Nazwisko:<br>
+        <input type="text" name="last_name" value="{{ employee.last_name }}" required>
+    </label><br><br>
+    <label>Rola:<br>
+        <select name="role_id">
+            <option value="">-- brak --</option>
+            {% for role in roles %}
+            <option value="{{ role.id }}" {% if employee.role_id == role.id %}selected{% endif %}>{{ role.name }}</option>
+            {% endfor %}
+        </select>
+    </label><br><br>
+    <label>Aktywny:
+        <input type="checkbox" name="active" {% if employee.active %}checked{% endif %}>
+    </label><br><br>
+    <button type="submit">Zapisz zmiany</button>
+    <a href="{{ url_for('employee_list') }}">Anuluj</a>
+</form>
+{% endblock %}
