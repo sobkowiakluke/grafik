@@ -1,0 +1,21 @@
+<h2>Lista grafików</h2>
+
+<table border="1" style="width:100%;">
+    <tr>
+        <th>ID</th>
+        <th>Rok</th>
+        <th>Miesiąc</th>
+        <th>Versja</th>
+        <th>Status</th>
+    </tr>
+
+    {% for s in schedules %}
+    <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.year }}</td>
+        <td>{{ s.month }}</td>
+        <td>{{ s.version }}</td>
+        <td>{{ s.status }}</td>
+    </tr>
+    {% endfor %}
+</table>

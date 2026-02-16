@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from app.db.connection import Database
 import bcrypt
-from app.web.routes_employee import employee_bp 
+from app.web.routes_employee import employee_bp
+from app.web.routes_schedule import schedule_bp
 
 # -------------------
 # Flask setup
@@ -12,6 +13,7 @@ app = Flask(__name__)
 app.secret_key = "super_secret_for_sessions"  # potrzebne do sesji
 
 app.register_blueprint(employee_bp, url_prefix="/employees")
+app.register_blueprint(schedule_bp, url_prefix="/schedule")
 
 login_manager = LoginManager()
 login_manager.login_view = "login"

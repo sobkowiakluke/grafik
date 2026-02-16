@@ -141,6 +141,7 @@
             <div class="menu-section">
                 <h3>Grafiki</h3>
                 <ul>
+                    <li id="list-schedules">Lista grafików</li>
                     <li id="show-schedule">Pokaż Grafik</li>
                     <li id="add-schedule">Dodaj Grafik</li>
                     <li id="edit-schedule">Edytuj Grafik</li>
@@ -172,6 +173,10 @@
                     mainContent.innerHTML = `<h2>${item.innerText}</h2><p>Tu pojawi się formularz / tabela dla "${item.innerText}".</p>`;
                 }
             });
+        });
+        document.getElementById('list-schedules').addEventListener('click', () => {
+            mainContent.innerHTML =
+                `<iframe src="/schedule/list" style="width:100%; height:100%; border:none;"></iframe>`;
         });
     </script>
 
