@@ -123,7 +123,32 @@ class ScheduleService:
             WHERE schedule_id=%s
             ORDER BY day
         """, (schedule_id,))
-        days = cur.fetchall() or []
+        days_raw = cur.fetchall() or []
+
+        # konwersja timedelta -> HH:MM
+        days = []
+
+        for d in days_raw:
+
+            if d["staff_from"] is None:
+                days.append({
+                    "day": d["day"],
+                    "staff_from": None,
+                    "store_close": None
+                })
+                continue
+
+            def td_to_hhmm(td):
+                total = int(td.total_seconds())
+                h = total // 3600
+                m = (total % 3600) // 60
+                return f"{h:02d}:{m:02d}"
+
+            days.append({
+                "day": d["day"],
+                "staff_from": td_to_hhmm(d["staff_from"]),
+                "store_close": td_to_hhmm(d["store_close"])
+            })
 
         # aktywni pracownicy
         cur.execute("""

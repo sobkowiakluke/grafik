@@ -1,48 +1,45 @@
 <h2>Widok miesiąca</h2>
 
-<style>
-.day-off {
-    background-color: #f8d7da;
-    color: #721c24;
-    font-weight: bold;
-}
+<table border="1" style="border-collapse:collapse; width:100%; text-align:center;">
 
-.day-work {
-    background-color: #d4edda;
-    color: #155724;
-}
-</style>
-
-<table border="1" style="border-collapse:collapse; width:100%;">
+    <!-- ===================================== -->
+    <!-- NAGŁÓWEK DNI + GODZINY SKLEPU -->
+    <!-- ===================================== -->
     <tr>
         <th>Pracownik</th>
 
         {% for d in matrix["days"] %}
-            <th>{{ d["day"] }}</th>
+            <th>
+                {{ d["day"] }}<br>
+
+                {% if d["staff_from"] %}
+                    <small>
+                        {{ d["staff_from"][:5] }} - {{ d["store_close"][:5] }}
+                    </small>
+                {% else %}
+                    <small style="color:red;">WOLNE</small>
+                {% endif %}
+            </th>
         {% endfor %}
     </tr>
 
+    <!-- ===================================== -->
+    <!-- WIERSZE PRACOWNIKÓW -->
+    <!-- ===================================== -->
     {% for emp in matrix["employees"] %}
     <tr>
-        <td>
+
+        <td style="text-align:left;">
             {{ emp["first_name"] }} {{ emp["last_name"] }}
         </td>
 
         {% for d in matrix["days"] %}
-
-            {% set day_data = emp["days"].get(d["day"]) %}
-
-            <td style="text-align:center;"
-                class="{% if not day_data %}day-off{% else %}day-work{% endif %}">
-
-                {% if day_data %}
-                    {{ day_data["staff_from"] }} - {{ day_data["store_close"] }}
-                {% else %}
-                    WOLNE
-                {% endif %}
+            <td>
+                {# Na razie brak przypisań pracowników #}
             </td>
-
         {% endfor %}
+
     </tr>
     {% endfor %}
+
 </table>
