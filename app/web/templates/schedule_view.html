@@ -1,0 +1,31 @@
+<h2>Grafik {{ schedule.year }}-{{ "%02d"|format(schedule.month) }}</h2>
+
+<table border="1" style="width:100%;">
+    <tr>
+        <th>Dzień</th>
+        <th>Godzina od</th>
+        <th>Godzina do</th>
+    </tr>
+
+    {% for d in days %}
+    <tr>
+        <td>{{ d.day }}</td>
+
+        <td>
+            {% if d.staff_from %}
+                {{ d.staff_from }}
+            {% else %}
+                WOLNE
+            {% endif %}
+        </td>
+
+        <td>
+            {% if d.store_close %}
+                {{ d.store_close }}
+            {% else %}
+                WOLNE
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>

@@ -11,7 +11,11 @@
 
     {% for s in schedules %}
     <tr>
-        <td>{{ s.id }}</td>
+        <td>
+             <a href="/schedule/{{ s.id }}" target="content-frame">
+                 {{ s.id }}
+             </a>
+        </td>
         <td>{{ s.year }}</td>
         <td>{{ s.month }}</td>
         <td>{{ s.version }}</td>
