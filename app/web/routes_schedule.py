@@ -84,3 +84,34 @@ def add_schedule():
         return redirect(url_for("schedule_bp.list_schedules"))
 
     return render_template("schedule_add.html")
+
+#=======================================================
+# Edycja dnia WebUI
+# url: /schedules/update_day
+#=======================================================
+
+@schedule_bp.route("/day/<int:day_id>", methods=["GET", "POST"])
+@login_required
+def edit_schedule_day(day_id):
+
+    # pobierz dane dnia (dopasuj metodę do swojego service)
+    day = schedule_service.get_schedule_day(day_id)
+
+    if request.method == "POST":
+        staff_from = request.form["staff_from"]
+        store_close = request.form["store_close"]
+
+        schedule_service.update_schedule_day_hours(
+            day_id,
+            staff_from,
+            store_close
+        )
+
+        return redirect(
+            url_for(
+                "schedule_bp.schedule_details",
+                schedule_id=day["schedule_id"]
+            )
+        )
+
+    return render_template("schedule_day_edit.html", day=day)

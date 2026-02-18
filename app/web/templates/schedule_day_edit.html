@@ -1,0 +1,13 @@
+<h4>Edycja dnia {{ day["day"] }}</h4>
+
+<form method="post">
+
+    <label>Od kiedy personel:</label><br>
+    <input type="time" name="staff_from" value="{{ day['staff_from'][:5] if day['staff_from'] }}"><br><br>
+
+    <label>Godzina zamknięcia:</label><br>
+    <input type="time" name="store_close" value="{{ day['store_close'][:5] if day['store_close'] }}"><br><br>
+
+    <button type="submit">Zapisz</button>
+
+</form>

@@ -20,7 +20,9 @@
         <th>Pracownik</th>
 
         {% for d in matrix["days"] %}
-            <th>
+
+        <th>
+            <a href="/schedule/day/{{ d['schedule_day_id'] }}" target="content-frame" style="text-decoration:none; color:inherit; display:block;">
                 {{ d["day"] }}<br>
 
                 {% if d["staff_from"] %}
@@ -30,7 +32,9 @@
                 {% else %}
                     <small style="color:red;">WOLNE</small>
                 {% endif %}
-            </th>
+            </a>
+        </th>
+
         {% endfor %}
     </tr>
 
