@@ -66,6 +66,7 @@ class EmployeeService:
         query = "DELETE FROM employees WHERE id = %s"
         cur.execute(query, (employee_id,))
         cur.close()
+        self.db.commit()
         print(f"Usunięto pracownika o ID {employee_id}")
 
     def get_employee(self, employee_id: int):

@@ -171,6 +171,14 @@ document.getElementById('list-schedules').addEventListener('click', () => {
             src="/schedule/list"
             style="width:100%; height:100%; border:none;"></iframe>`;
 });
+
+document.getElementById('add-schedule').addEventListener('click', () => {
+    mainContent.innerHTML =
+        `<iframe name="content-frame"
+            src="/schedule/add"
+            style="width:100%; height:100%; border:none;"></iframe>`;
+});
+
 </script>
 
 <script>
