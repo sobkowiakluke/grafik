@@ -1,8 +1,16 @@
-<h2>
-Widok miesiąca
-{{ "%02d"|format(schedule.month) }}.{{ schedule.year }}
-</h2>
+{% set months = [
+"", "Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
+"Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"
+] %}
 
+<div class="schedule-sticky-header">
+    <h4 class="mb-0">
+        Grafik {{ months[schedule.month] }} {{ schedule.year }}
+        <small class="text-muted">
+            v{{ schedule.version }} • {{ schedule.status }}
+        </small>
+    </h4>
+</div>
 <table border="1" style="border-collapse:collapse; width:100%; text-align:center;">
 
     <!-- ===================================== -->
