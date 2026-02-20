@@ -189,3 +189,18 @@ class ScheduleService:
             "days": days,
             "employees": employees
         }
+
+    from app import db
+    from app.services.schedule_day_service import ScheduleDayService
+
+
+    def update_day_hours(self, schedule_id, day, staff_from, store_close):
+
+        day_service = ScheduleDayService(self.db)
+
+        day_service.set_day_hours(
+            schedule_id,
+            day,
+            staff_from,
+            store_close
+        )

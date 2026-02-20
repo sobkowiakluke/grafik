@@ -1,3 +1,4 @@
+from flask import render_template, request, redirect, url_for
 from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required
 
@@ -38,18 +39,65 @@ def list_schedules():
 # Szczegóły grafiku
 # URL: /schedules/<id>
 # =====================================================
-@schedule_bp.route("/<int:schedule_id>")
+@schedule_bp.route("/<int:schedule_id>", methods=["GET", "POST"])
 @login_required
 def schedule_details(schedule_id):
 
+    # =====================================
+    # PARAMETRY
+    # =====================================
+    edit_day = request.args.get("edit_day", type=int)
+
+    # =====================================
+    # ZAPIS GODZIN (POST)
+    # =====================================
+    if request.method == "POST" and edit_day:
+
+        staff_from = request.form.get("staff_from") or None
+        store_close = request.form.get("store_close") or None
+
+        schedule_service.update_day_hours(
+            schedule_id,
+            edit_day,
+            staff_from,
+            store_close
+        )
+
+        # redirect tylko po POST
+        return redirect(url_for(
+            "schedule_bp.schedule_details",
+            schedule_id=schedule_id,
+            edit_day=edit_day
+        ))
+
+    # =====================================
+    # POBRANIE DANYCH DO WIDOKU
+    # =====================================
     schedule = schedule_service.get_schedule(schedule_id)
     matrix = schedule_service.get_month_matrix(schedule_id)
 
+    # =====================================
+    # SZUKANIE DANYCH DNIA
+    # =====================================
+    day_data = None
+
+    if edit_day:
+        for d in matrix["days"]:
+            if d["day"] == edit_day:
+                day_data = d
+                break
+
+    # =====================================
+    # RENDER
+    # =====================================
     return render_template(
         "schedule_month.html",
         schedule=schedule,
-        matrix=matrix
+        matrix=matrix,
+        edit_day=edit_day,
+        day_data=day_data
     )
+
 # =====================================================
 # Widok miesiąca (macierz)
 # URL: /schedules/<id>/month
@@ -115,3 +163,17 @@ def edit_schedule_day(day_id):
         )
 
     return render_template("schedule_day_edit.html", day=day)
+
+
+@schedule_bp.route("/<int:schedule_id>/day/<int:day>")
+@login_required
+def schedule_day(schedule_id, day):
+    schedule = schedule_service.get_schedule(schedule_id)
+    matrix = schedule_service.get_month_matrix(schedule_id)
+
+    return render_template(
+        "schedule_day.html",
+        schedule=schedule,
+        matrix=matrix,
+        day=day
+    )

@@ -1,0 +1,13 @@
+<h3>Widok dnia</h3>
+
+<p>
+Grafik: {{ schedule.name }}<br>
+Dzień: {{ day }}
+</p>
+
+<p>
+<a href="{{ url_for('schedule_bp.schedule_details',
+                    schedule_id=schedule.id) }}">
+← Powrót do miesiąca
+</a>
+</p>

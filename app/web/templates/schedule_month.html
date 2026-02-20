@@ -1,3 +1,4 @@
+EDIT DAY = {{ edit_day }}
 {% set months = [
 "", "Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
 "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"
@@ -21,19 +22,24 @@
 
         {% for d in matrix["days"] %}
 
-        <th>
-            <a href="/schedule/day/{{ d['schedule_day_id'] }}" target="content-frame" style="text-decoration:none; color:inherit; display:block;">
-                {{ d["day"] }}<br>
+<th>
 
-                {% if d["staff_from"] %}
-                    <small>
-                        {{ d["staff_from"][:5] }} - {{ d["store_close"][:5] }}
-                    </small>
-                {% else %}
-                    <small style="color:red;">WOLNE</small>
-                {% endif %}
-            </a>
-        </th>
+    <a href="{{ url_for('schedule_bp.schedule_details',
+                        schedule_id=schedule.id,
+                        edit_day=d['day']) }}">
+
+      {{ d["day"] }}<br>
+
+      <small>
+        {% if d["staff_from"] and d["store_close"] %}
+            {{ d["staff_from"] }}–{{ d["store_close"] }}
+        {% else %}
+            WOLNE
+        {% endif %}
+      </small>
+
+  </a>
+</th>
 
         {% endfor %}
     </tr>
@@ -58,3 +64,26 @@
     {% endfor %}
 
 </table>
+{% if edit_day %}
+<hr>
+
+<h5>Edycja dnia {{ edit_day }}</h5>
+
+<form method="post"
+      action="{{ url_for('schedule_bp.schedule_details',
+                         schedule_id=schedule.id,
+                         edit_day=edit_day) }}">
+    Od:
+    <input type="time"
+           name="staff_from"
+           value="{{ day_data.staff_from if day_data else '' }}">
+
+    Do:
+    <input type="time"
+           name="store_close"
+           value="{{ day_data.store_close if day_data else '' }}">
+
+    <button type="submit">Zapisz</button>
+</form>
+
+{% endif %}

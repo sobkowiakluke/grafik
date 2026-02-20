@@ -1,6 +1,5 @@
 from app.db.connection import Database
 
-
 class ScheduleDayService:
     """
     Zarządza dniami grafiku (tabela schedule_days):
@@ -118,3 +117,43 @@ class ScheduleDayService:
         row = cur.fetchone()
         cur.close()
         return row
+
+    from app import db
+
+    def update_hours(self, schedule_id, day, staff_from, store_close):
+
+        row = ScheduleDay.query.filter_by(
+            schedule_id=schedule_id,
+            day=day
+        ).first()
+
+        if not row:
+            return
+
+        row.staff_from = staff_from
+        row.store_close = store_close
+
+        db.session.commit()
+
+    def update_hours(self, schedule_id, day, staff_from, store_close):
+
+        sql = """
+            UPDATE schedule_days
+            SET staff_from = %s,
+                store_close = %s
+            WHERE schedule_id = %s
+              AND day = %s
+        """
+
+        conn = self.db.connection
+        cur = conn.cursor()
+
+        cur.execute(sql, (
+            staff_from,
+            store_close,
+            schedule_id,
+            day
+        ))
+
+        conn.commit()
+        cur.close()
