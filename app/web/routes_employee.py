@@ -11,15 +11,25 @@ def list_employees():
     employees = employee_service.list_employees()
     return render_template("employee_list.html", employees=employees)
 
-@employee_bp.route('/employees/add', methods=['POST'])
+@employee_bp.route('/add', methods=['GET'])
+@login_required
+def add_employee_form():
+    roles = employee_service.list_roles()
+    return render_template("employee_add.html", roles=roles)
+
+@employee_bp.route('/add', methods=['POST'])
 @login_required
 def add_employee():
-    first_name = request.form.get('first_name')
-    last_name = request.form.get('last_name')
-    role_id = request.form.get('role_id') or None
-    employee_service.add_employee(first_name, last_name, role_id)
-    flash(f"Pracownik {first_name} {last_name} dodany.", "success")
-    return redirect(url_for('employee_bp.list_employees'))
+
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    role_id = request.form.get("role_id")
+    active = 1 if request.form.get("active") else 0
+
+    employee_service.add_employee(first_name, last_name, role_id, active)
+
+    return redirect(url_for('employee.list_employees'))   # ✔ TU redirect jest OK
+
 
 @employee_bp.route('/employees/edit/<int:employee_id>', methods=['POST'])
 @login_required
@@ -39,3 +49,4 @@ def delete_employee(employee_id):
     employee_service.delete_employee(employee_id)
     flash(f"Pracownik o ID {employee_id} usunięty.", "warning")
     return redirect(url_for('employee_bp.list_employees'))
+
