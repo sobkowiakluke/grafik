@@ -58,6 +58,7 @@ class EmployeeService:
         """
         cur.execute(query, (first_name, last_name, role_id, active))
         cur.close()
+        self.db.commit()
         print(f"Dodano pracownika: {first_name} {last_name} (rola id={role_id}, active={active})")
 
 
