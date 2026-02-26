@@ -18,7 +18,7 @@ class ScheduleService:
         start_dt = datetime(year, month, 1, 0, 0, 0)
         end_dt = datetime(year, month, last_day, 23, 59, 59)
 
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
 
         # kolejna wersja grafiku
         cur.execute(
@@ -57,7 +57,7 @@ class ScheduleService:
     # LISTA GRAFIKÓW (WEBUI)
     # --------------------------------------------------
     def list_schedules(self):
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
         cur.execute("""
             SELECT id, year, month, version, status
             FROM schedules
@@ -71,7 +71,7 @@ class ScheduleService:
     # POBRANIE JEDNEGO GRAFIKU
     # --------------------------------------------------
     def get_schedule(self, schedule_id: int):
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
         cur.execute(
             "SELECT * FROM schedules WHERE id=%s",
             (schedule_id,)
@@ -95,7 +95,7 @@ class ScheduleService:
     # LISTA DNI (WEBUI)
     # --------------------------------------------------
     def list_days(self, schedule_id: int):
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
         cur.execute(
             """
             SELECT day, staff_from, store_close
@@ -114,7 +114,7 @@ class ScheduleService:
     # --------------------------------------------------
     def get_month_matrix(self, schedule_id: int):
 
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
 
         # dni grafiku
         cur.execute("""

@@ -87,7 +87,7 @@ class ScheduleDayService:
             ...
         ]
         """
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
         cur.execute(
             """
             SELECT day, staff_from, store_close
@@ -105,7 +105,7 @@ class ScheduleDayService:
     # Jeden dzień
     # -------------------------------------------------
     def get_day(self, schedule_id: int, day_number: int):
-        cur = self.db.cursor(dictionary=True)
+        cur = self.db.cursor()
         cur.execute(
             """
             SELECT day, staff_from, store_close
