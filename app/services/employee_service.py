@@ -121,6 +121,7 @@ class EmployeeService:
         values.append(employee_id)
         query = f"UPDATE employees SET {', '.join(fields)} WHERE id = %s"
         cur.execute(query, values)
+        self.db.commit()
         cur.close()
         print(f"Zaktualizowano pracownika o ID {employee_id}")
 
