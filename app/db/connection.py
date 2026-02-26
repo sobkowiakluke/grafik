@@ -1,4 +1,4 @@
-from app.db.config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+from app.settings import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
 import mysql.connector
 
 class Database:

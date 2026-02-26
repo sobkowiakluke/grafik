@@ -1,4 +1,5 @@
-# app/web/app.py
+from app.settings import SECRET_KEY, DEBUG
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from app.db.connection import Database
@@ -10,7 +11,8 @@ from app.web.routes_schedule import schedule_bp
 # Flask setup
 # -------------------
 app = Flask(__name__)
-app.secret_key = "super_secret_for_sessions"  # potrzebne do sesji
+app.secret_key = SECRET_KEY
+app.debug = DEBUG
 
 app.register_blueprint(employee_bp, url_prefix="/employees")
 app.register_blueprint(schedule_bp, url_prefix="/schedule")
@@ -90,4 +92,4 @@ except ModuleNotFoundError:
 # Run server
 # -------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5566, debug=True)
+    app.run(host="0.0.0.0", port=5566, debug=app.debug)

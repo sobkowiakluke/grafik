@@ -1,6 +1,5 @@
 # Database credentials
-app/db/config.py
-
+app/settings.py
 # virtual environment
 venv/
 
