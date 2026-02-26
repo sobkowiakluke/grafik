@@ -118,22 +118,6 @@ class ScheduleDayService:
         cur.close()
         return row
 
-    from app import db
-
-    def update_hours(self, schedule_id, day, staff_from, store_close):
-
-        row = ScheduleDay.query.filter_by(
-            schedule_id=schedule_id,
-            day=day
-        ).first()
-
-        if not row:
-            return
-
-        row.staff_from = staff_from
-        row.store_close = store_close
-
-        db.session.commit()
 
     def update_hours(self, schedule_id, day, staff_from, store_close):
 
