@@ -1,50 +1,10 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
+
     <meta charset="UTF-8">
     <title>Panel grafiku</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            display: flex;
-            height: 100vh;
-        }
-
-        #sidebar {
-            width: 240px;
-            background: #2f3542;
-            color: white;
-            padding: 15px;
-        }
-
-        #sidebar h3 {
-            margin-top: 20px;
-            font-size: 16px;
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-        }
-
-        #sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        #sidebar li {
-            padding: 8px;
-            cursor: pointer;
-        }
-
-        #sidebar li:hover {
-            background: #57606f;
-        }
-
-        #main-content {
-            flex: 1;
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
 
