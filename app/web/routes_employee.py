@@ -11,14 +11,25 @@ employee_bp = Blueprint("employee", __name__, template_folder="templates")
 def get_employee_service():
     return EmployeeService(get_db())
 
-
 @employee_bp.route("/list")
 @login_required
 def list_employees():
     service = get_employee_service()
-    employees = service.list_employees()
-    return render_template("employee_list.html", employees=employees)
 
+    sort = request.args.get("sort", "last_name")
+    order = request.args.get("order", "asc")
+
+    employees = service.list_employees(sort=sort, order=order)
+
+    next_order = "desc" if order == "asc" else "asc"
+
+    return render_template(
+        "employee_list.html",
+        employees=employees,
+        current_sort=sort,
+        current_order=order,
+        next_order=next_order,
+    )
 
 @employee_bp.route("/add", methods=["GET"])
 @login_required

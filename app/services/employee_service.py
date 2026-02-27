@@ -3,9 +3,29 @@ class EmployeeService:
     def __init__(self, db):
         self.db = db
 
-    def list_employees(self):
+    def list_employees(self, sort="last_name", order="asc"):
+        allowed_fields = {
+            "id": "e.id",
+            "first_name": "e.first_name",
+            "last_name": "e.last_name",
+            "role": "r.name",
+            "active": "e.active",
+        }
+
+        sort_column = allowed_fields.get(sort, "e.last_name")
+        order_sql = "ASC" if order.lower() == "asc" else "DESC"
+
+        sql = f"""
+            SELECT 
+                e.*,
+                r.name AS role
+            FROM employees e
+            LEFT JOIN roles r ON e.role_id = r.id
+            ORDER BY {sort_column} {order_sql}
+        """
+
         cur = self.db.cursor()
-        cur.execute("SELECT * FROM employees ORDER BY last_name")
+        cur.execute(sql)
         rows = cur.fetchall()
         cur.close()
         return rows

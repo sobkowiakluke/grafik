@@ -1,3 +1,4 @@
+from flask import request
 from calendar import monthrange
 from datetime import datetime, date
 from app.db.connection import Database
@@ -56,16 +57,37 @@ class ScheduleService:
     # --------------------------------------------------
     # LISTA GRAFIKÓW (WEBUI)
     # --------------------------------------------------
-    def list_schedules(self):
-        cur = self.db.cursor()
-        cur.execute("""
+    def list_schedules(self, sort="year", order="desc"):
+
+        allowed_fields = {
+            "id": "id",
+            "year": "year",
+            "month": "month",
+            "version": "version",
+            "status": "status",
+        }
+
+        order_sql = "ASC" if order.lower() == "asc" else "DESC"
+
+        if sort == "year":
+            # chronologiczne sortowanie: rok + miesiąc + wersja
+            order_clause = f"year {order_sql}, month {order_sql}, version {order_sql}"
+        else:
+            sort_column = allowed_fields.get(sort, "year")
+            order_clause = f"{sort_column} {order_sql}"
+
+        sql = f"""
             SELECT id, year, month, version, status
             FROM schedules
-            ORDER BY year DESC, month DESC, version DESC
-        """)
+            ORDER BY {order_clause}
+        """
+
+        cur = self.db.cursor()
+        cur.execute(sql)
         rows = cur.fetchall()
         cur.close()
         return rows or []
+
 
     # --------------------------------------------------
     # POBRANIE JEDNEGO GRAFIKU

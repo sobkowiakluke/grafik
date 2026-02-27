@@ -28,14 +28,20 @@ def get_schedule_service():
 @schedule_bp.route("/list")
 @login_required
 def list_schedules():
+
     service = get_schedule_service()
-    schedules = service.list_schedules()
+
+    sort = request.args.get("sort", "year")
+    order = request.args.get("order", "desc")
+
+    schedules = service.list_schedules(sort=sort, order=order)
 
     return render_template(
         "schedule_list.html",
-        schedules=schedules
+        schedules=schedules,
+        current_sort=sort,
+        current_order=order,
     )
-
 
 # =====================================================
 # Szczegóły grafiku

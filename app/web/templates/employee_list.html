@@ -1,14 +1,36 @@
 <!-- app/web/templates/employee_list.html -->
 <h2>Lista pracowników</h2>
 <table border="1" style="width:100%;">
+
     <tr>
-        <th>ID</th>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Rola</th>
-        <th>Aktywny</th>
-	<th>Akcje</th>
+        <th>
+            <a href="{{ url_for('employee.list_employees', sort='id', order=next_order) }}">
+            ID
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('employee.list_employees', sort='first_name', order=next_order) }}">
+                Imię
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('employee.list_employees', sort='last_name', order=next_order) }}">
+                Nazwisko
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('employee.list_employees', sort='role', order=next_order) }}">
+                Rola
+            </a>
+        </th>
+        <th>
+            <a href="{{ url_for('employee.list_employees', sort='active', order=next_order) }}">
+                Aktywny
+            </a>
+        </th>
+        <th>Akcje</th>
     </tr>
+
     {% for emp in employees %}
     <tr>
         <td>{{ emp.id }}</td>

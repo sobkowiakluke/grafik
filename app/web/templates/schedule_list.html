@@ -2,13 +2,46 @@
 
 <table border="1" style="width:100%;">
     <tr>
-        <th>ID</th>
-        <th>Rok</th>
-        <th>Miesiąc</th>
-        <th>Versja</th>
-        <th>Status</th>
-    </tr>
+        <th>
+            <a href="{{ url_for('schedule_bp.list_schedules',
+                                sort='id',
+                                order='asc' if current_sort != 'id' or current_order == 'desc' else 'desc') }}">
+                ID
+            </a>
+        </th>
 
+        <th>
+            <a href="{{ url_for('schedule_bp.list_schedules',
+                                sort='year',
+                                order='asc' if current_sort != 'year' or current_order == 'desc' else 'desc') }}">
+                Rok
+            </a>
+        </th>
+
+        <th>
+            <a href="{{ url_for('schedule_bp.list_schedules',
+                                sort='month',
+                                order='asc' if current_sort != 'month' or current_order == 'desc' else 'desc') }}">
+                Miesiąc
+            </a>
+        </th>
+
+        <th>
+            <a href="{{ url_for('schedule_bp.list_schedules',
+                                sort='version',
+                                order='asc' if current_sort != 'version' or current_order == 'desc' else 'desc') }}">
+                Versja
+            </a>
+        </th>
+
+        <th>
+            <a href="{{ url_for('schedule_bp.list_schedules',
+                                sort='status',
+                                order='asc' if current_sort != 'status' or current_order == 'desc' else 'desc') }}">
+                Status
+            </a>
+        </th>
+    </tr>
     {% for s in schedules %}
     <tr>
         <td>
