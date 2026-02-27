@@ -1,3 +1,4 @@
+
 from flask import Flask, redirect, url_for
 from flask_login import login_required
 
@@ -23,7 +24,7 @@ login_manager.login_view = "auth.login"
 
 
 # Blueprints
-app.register_blueprint(auth_bp)  
+app.register_blueprint(auth_bp)
 app.register_blueprint(employee_bp, url_prefix="/employees")
 app.register_blueprint(schedule_bp, url_prefix="/schedules")
 

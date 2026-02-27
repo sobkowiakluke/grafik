@@ -1,0 +1,56 @@
+<h2>Dodaj wolne</h2>
+
+<form method="post">
+
+    <div>
+        <label>Pracownik:</label><br>
+        <select name="employee_id" required>
+            <option value="">-- wybierz --</option>
+            {% for emp in employees %}
+                <option value="{{ emp.id }}">
+                    {{ emp.last_name }} {{ emp.first_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Od:</label><br>
+        <input type="date" name="date_from" required>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Do:</label><br>
+        <input type="date" name="date_to" required>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Powód:</label><br>
+        <select name="reason_id" required>
+            <option value="">-- wybierz --</option>
+            {% for reason in reasons %}
+                <option value="{{ reason.id }}">
+                    {{ reason.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <br>
+
+    <div>
+        <label>Notatka:</label><br>
+        <input type="text" name="notes" maxlength="256">
+    </div>
+
+    <br>
+
+    <button type="submit">Zapisz</button>
+
+</form>

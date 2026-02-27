@@ -89,3 +89,84 @@ def delete_employee(employee_id):
     flash(f"Pracownik o ID {employee_id} usunięty.", "warning")
 
     return redirect(url_for("employee.list_employees"))
+
+
+
+@employee_bp.route("/time-off/add", methods=["GET", "POST"])
+@login_required
+def add_time_off():
+
+    from app.db.provider import get_db
+    from flask import request, redirect, url_for
+
+    db = get_db()
+    cur = db.cursor()
+
+    # GET – tylko render formularza
+    if request.method == "GET":
+
+        cur.execute("""
+            SELECT id, first_name, last_name
+            FROM employees
+            WHERE active = 1
+            ORDER BY last_name, first_name
+        """)
+        employees = cur.fetchall()
+
+        cur.execute("""
+            SELECT id, name
+            FROM time_off_reasons
+            WHERE active = TRUE
+            ORDER BY name
+        """)
+        reasons = cur.fetchall()
+
+        cur.close()
+
+        return render_template(
+            "employee_time_off_form.html",
+            employees=employees,
+            reasons=reasons
+        )
+
+    # POST
+    employee_id = request.form.get("employee_id")
+    date_from = request.form.get("date_from")
+    date_to = request.form.get("date_to")
+    reason_id = request.form.get("reason_id")
+    notes = request.form.get("notes")
+
+    # walidacja podstawowa
+    if not employee_id or not date_from or not date_to or not reason_id:
+        return "Brak wymaganych danych", 400
+
+    if date_from > date_to:
+        return "Data początkowa nie może być późniejsza niż końcowa", 400
+
+    # 🔎 sprawdzenie kolizji
+    cur.execute("""
+        SELECT id
+        FROM employee_time_off
+        WHERE employee_id = %s
+        AND NOT (
+            date_to < %s OR date_from > %s
+        )
+    """, (employee_id, date_from, date_to))
+
+    collision = cur.fetchone()
+
+    if collision:
+        cur.close()
+        return "Ten pracownik ma już wolne w podanym zakresie", 400
+
+    # ✅ INSERT
+    cur.execute("""
+        INSERT INTO employee_time_off
+        (employee_id, date_from, date_to, reason_id, notes)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (employee_id, date_from, date_to, reason_id, notes))
+
+    db.commit()
+    cur.close()
+
+    return "Zapisano poprawnie"
