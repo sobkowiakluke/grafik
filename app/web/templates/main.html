@@ -58,13 +58,21 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* menu */
-    document.querySelectorAll(".menu-link").forEach(el => {
-        el.addEventListener("click", function (e) {
-            e.preventDefault();
-            loadPage(el.dataset.url);
-        });
-    });
+document.querySelectorAll(".menu-link").forEach(el => {
+    el.addEventListener("click", function (e) {
 
+        e.preventDefault();
+
+        /* usuń active ze wszystkich */
+        document.querySelectorAll("#sidebar .menu-link")
+            .forEach(li => li.classList.remove("active"));
+
+        /* dodaj active do klikniętego */
+        el.classList.add("active");
+
+        loadPage(el.dataset.url);
+    });
+});
 
 document.addEventListener("submit", function (e) {
 
@@ -110,9 +118,6 @@ document.addEventListener("submit", function (e) {
     });
 
 });
-</script>
-<script>
-console.log("MAIN JS LOADED");
 </script>
 </body>
 </html>
