@@ -137,7 +137,15 @@ class ScheduleService:
     def get_month_matrix(self, schedule_id: int):
 
         cur = self.db.cursor()
+        # pobierz rok i miesiąc grafiku
+        cur.execute(
+            "SELECT year, month FROM schedules WHERE id=%s",
+            (schedule_id,)
+        )
+        schedule_row = cur.fetchone()
 
+        year = schedule_row["year"]
+        month = schedule_row["month"]
         # dni grafiku
         cur.execute("""
             SELECT day, staff_from, store_close
@@ -181,10 +189,46 @@ class ScheduleService:
         """)
         employees_raw = cur.fetchall() or []
 
+
+
+        # zakres miesiąca
+        from datetime import date
+        from calendar import monthrange
+
+        start_date = date(year, month, 1)
+        last_day = monthrange(year, month)[1]
+        end_date = date(year, month, last_day)
+
+        # pobierz wolne w tym miesiącu
+        cur.execute("""
+            SELECT employee_id, date_from, date_to
+            FROM employee_time_off
+            WHERE NOT (
+                date_to < %s OR date_from > %s
+            )
+        """, (start_date, end_date))
+
+        time_off_rows = cur.fetchall() or []
+
+        # budujemy mapę
+        time_off_map = {}
+
+        for row in time_off_rows:
+            emp_id = row["employee_id"]
+            start = row["date_from"]
+            end = row["date_to"]
+
+            if emp_id not in time_off_map:
+                time_off_map[emp_id] = []
+
+            time_off_map[emp_id].append((start, end))
+
         cur.close()
 
         # budujemy strukturę pod template
         employees = []
+
+
 
         for emp in employees_raw:
 
@@ -197,16 +241,32 @@ class ScheduleService:
 
             for d in days:
 
+                day_number = d["day"]
+                current_date = date(year, month, day_number)
+
+                is_time_off = False
+
+                if emp["id"] in time_off_map:
+                    for start, end in time_off_map[emp["id"]]:
+                        if start <= current_date <= end:
+                            is_time_off = True
+                            break
+
                 if d["staff_from"] is None:
+                    emp_row["days"][day_number] = {
+                        "staff_from": None,
+                        "store_close": None,
+                        "is_time_off": is_time_off
+                    }
                     continue
 
-                emp_row["days"][d["day"]] = {
+                emp_row["days"][day_number] = {
                     "staff_from": str(d["staff_from"])[:5],
-                    "store_close": str(d["store_close"])[:5]
+                    "store_close": str(d["store_close"])[:5],
+                    "is_time_off": is_time_off
                 }
 
             employees.append(emp_row)
-
         return {
             "days": days,
             "employees": employees

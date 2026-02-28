@@ -1,4 +1,4 @@
-EDIT DAY = {{ edit_day }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 {% set months = [
 "", "Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
 "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"
@@ -12,7 +12,8 @@ EDIT DAY = {{ edit_day }}
         </small>
     </h4>
 </div>
-<table border="1" style="border-collapse:collapse; width:100%; text-align:center;">
+
+<table class="schedule-table">
 
     <!-- ===================================== -->
     <!-- NAGŁÓWEK DNI + GODZINY SKLEPU -->
@@ -21,26 +22,21 @@ EDIT DAY = {{ edit_day }}
         <th>Pracownik</th>
 
         {% for d in matrix["days"] %}
+        <th>
+            <a href="{{ url_for('schedule_bp.schedule_details',
+                                schedule_id=schedule.id,
+                                edit_day=d['day']) }}">
+                {{ d["day"] }}<br>
 
-<th>
-
-    <a href="{{ url_for('schedule_bp.schedule_details',
-                        schedule_id=schedule.id,
-                        edit_day=d['day']) }}">
-
-      {{ d["day"] }}<br>
-
-      <small>
-        {% if d["staff_from"] and d["store_close"] %}
-            {{ d["staff_from"] }}–{{ d["store_close"] }}
-        {% else %}
-            WOLNE
-        {% endif %}
-      </small>
-
-  </a>
-</th>
-
+                <small>
+                {% if d["staff_from"] and d["store_close"] %}
+                    {{ d["staff_from"] }}–{{ d["store_close"] }}
+                {% else %}
+                    WOLNE
+                {% endif %}
+                </small>
+            </a>
+        </th>
         {% endfor %}
     </tr>
 
@@ -55,15 +51,18 @@ EDIT DAY = {{ edit_day }}
         </td>
 
         {% for d in matrix["days"] %}
-            <td>
-                {# Na razie brak przypisań pracowników #}
+
+            {% set cell = emp.days[d["day"]] %}
+
+            <td class="{% if cell.is_time_off %}time-off{% endif %}">
             </td>
-        {% endfor %}
+         {% endfor %}
 
     </tr>
     {% endfor %}
 
 </table>
+
 {% if edit_day %}
 <hr>
 
@@ -73,6 +72,7 @@ EDIT DAY = {{ edit_day }}
       action="{{ url_for('schedule_bp.schedule_details',
                          schedule_id=schedule.id,
                          edit_day=edit_day) }}">
+
     Od:
     <input type="time"
            name="staff_from"

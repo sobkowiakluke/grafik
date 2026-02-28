@@ -1,3 +1,33 @@
+.schedule-table {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+}
+
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid #999;
+    padding: 4px 6px;
+}
+
+.schedule-table th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+.schedule-table td.time-off {
+    background-color: #ff4d4d;
+}
+
+table td.time-off {
+    background-color: #ff4d4d !important;
+    color: #000 !important;
+}
+
+.time-off {
+    background-color: #ffcccc;
+}
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
