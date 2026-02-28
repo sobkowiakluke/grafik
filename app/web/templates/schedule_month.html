@@ -1,16 +1,3 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
-
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
-</head>
-<body>
-
-
 {% set months = [
 "", "Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
 "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"
@@ -26,7 +13,7 @@
 </div>
 
 <div class="schedule-table-wrapper">
-<table class="schedule-table">
+<table class="table">
 
     <!-- ===================================== -->
     <!-- NAGŁÓWEK DNI + GODZINY SKLEPU -->
@@ -99,5 +86,3 @@
     <button type="submit">Zapisz</button>
 </form>
 {% endif %}
-</body>
-</html>

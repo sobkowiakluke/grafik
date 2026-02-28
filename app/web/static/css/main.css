@@ -43,8 +43,10 @@ body {
 
 /* Sidebar */
 #sidebar {
+    width: 220px;
     background: var(--bg-panel);
     color: var(--text-main);
+    flex-shrink: 0;   /* ← KLUCZOWE */
 }
 /* Workspace */
 #main-content {
@@ -53,7 +55,7 @@ body {
     background: #f5f6f8;
     overflow: auto;
 }
-
+/*
 .schedule-table {
     border-collapse: collapse;
     width: 100%;
@@ -74,7 +76,7 @@ body {
 .schedule-table td.time-off {
     background-color: #ff4d4d;
 }
-
+*/
 table td.time-off {
     background-color: #ff4d4d !important;
     color: #000 !important;
@@ -93,11 +95,11 @@ table td.time-off {
 
 #sidebar ul {
     list-style: none;
-    padding: 0;
+    padding: 8px 16px;
 }
 
 #sidebar li {
-    padding: 8px;
+    padding: 10px 16px;
     cursor: pointer;
 }
 
@@ -121,8 +123,10 @@ table td.time-off {
 
 .table thead th {
     background: var(--bg-panel);
+    color: var(--text-main);
     font-weight: 600;
     text-align: left;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .table tbody tr:hover {
