@@ -1,7 +1,5 @@
-<!-- app/web/templates/employee_list.html -->
 <h2>Lista pracowników</h2>
-<table border="1" style="width:100%;">
-
+<table class="table">
     <tr>
         <th>
             <a href="{{ url_for('employee.list_employees', sort='id', order=next_order) }}">

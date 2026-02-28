@@ -1,0 +1,73 @@
+.page {
+    padding: 24px;
+}
+
+.page-header {
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.page-header .meta {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.page-body {
+    background: var(--bg-panel);
+    padding: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-table);
+    color: var(--text-main);
+    font-size: 14px;
+}
+.schedule-table th,
+.schedule-table td {
+    border: 1px solid var(--border-color);
+    padding: 6px 8px;
+}
+.schedule-table thead th {
+    background: #2a2d34;               /* ciemny, ale odróżnialny */
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+}
+.schedule-table tbody tr:hover {
+    background: var(--bg-hover);
+}
+.schedule-table th:first-child,
+.schedule-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+    background: #23252b;
+}
+.schedule-table thead th:not(:first-child) {
+    font-size: 13px;
+    color: #333;
+}
+.schedule-table td.time-off {
+    background: var(--danger);
+    color: #111;
+    font-weight: 600;
+}
+.schedule-table-wrapper {
+    overflow-x: auto;
+}
+.schedule-sticky-header {
+    background: var(--bg-panel);
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+}

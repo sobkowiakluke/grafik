@@ -1,8 +1,31 @@
-<h3>Dodaj grafik</h3>
+<h2>Dodaj grafik</h2>
 
-<form method="post">
-    Rok: <input type="number" name="year" required>
-    Miesiąc: <input type="number" name="month" min="1" max="12" required>
+<form method="post" action="{{ url_for('schedule_bp.add_schedule') }}" class="form">
+    <div class="form-group">
+        <label for="year">Rok</label>
+        <input type="number" name="year" id="year" required>
+    </div>
 
-    <button type="submit">Generuj</button>
+    <div class="form-group">
+        <label for="month">Miesiąc</label>
+        <input type="number" name="month" id="month" min="1" max="12" required>
+    </div>
+
+    <div class="form-group">
+        <label for="status">Status</label>
+        <select name="status" id="status">
+            <option value="draft">draft</option>
+            <option value="final">final</option>
+        </select>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="button">Utwórz</button>
+        <a href="{{ url_for('schedule_bp.list_schedules') }}"
+           class="button button-secondary">
+            Anuluj
+        </a>
+    </div>
+
 </form>
+

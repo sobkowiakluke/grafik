@@ -1,30 +1,40 @@
+<body style="background:#1e1f23;">
 <h2>Dodaj pracownika</h2>
 
-<form method="post" action="{{ url_for('employee.add_employee') }}">
+<form method="post" action="{{ url_for('employee.add_employee') }}" class="form">
 
-    <label>Imię:<br>
-        <input type="text" name="first_name" required>
-    </label><br><br>
+    <div class="form-group">
+        <label for="first_name">Imię</label>
+        <input type="text" name="first_name" id="first_name" required>
+    </div>
 
-    <label>Nazwisko:<br>
-        <input type="text" name="last_name" required>
-    </label><br><br>
+    <div class="form-group">
+        <label for="last_name">Nazwisko</label>
+        <input type="text" name="last_name" id="last_name" required>
+    </div>
 
-    <label>Rola:<br>
-        <select name="role_id">
+    <div class="form-group">
+        <label for="role_id">Rola</label>
+        <select name="role_id" id="role_id">
             <option value="">-- brak --</option>
             {% for role in roles %}
             <option value="{{ role.id }}">{{ role.name }}</option>
             {% endfor %}
         </select>
-    </label><br><br>
+    </div>
 
-    <label>Aktywny:
-        <input type="checkbox" name="active" checked>
-    </label><br><br>
+    <div class="form-group checkbox-group">
+        <label>
+            <input type="checkbox" name="active" checked>
+            Aktywny
+        </label>
+    </div>
 
-    <button type="submit">Dodaj</button>
-
-    <a href="{{ url_for('employee.list_employees') }}">Anuluj</a>
+    <div class="form-actions">
+        <button type="submit" class="button">Dodaj</button>
+        <a href="{{ url_for('employee.list_employees') }}" class="button button-secondary">
+            Anuluj
+        </a>
+    </div>
 
 </form>

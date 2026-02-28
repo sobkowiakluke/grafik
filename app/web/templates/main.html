@@ -7,58 +7,111 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
 <body>
+<div id="layout">
+    <div id="sidebar">
 
-<div id="sidebar">
-
-    <h3>Pracownicy</h3>
-<ul>
-    <li class="menu-link"
-        data-url="{{ url_for('employee.list_employees') }}">
-        Lista
-    </li>
-
-    <li class="menu-link"
-        data-url="{{ url_for('employee.add_employee_form') }}">
-        Dodawanie
-    </li>
-    <li class="menu-link"
-        data-url="{{ url_for('employee.add_time_off') }}">
-        Dodaj wolne
-    </li>
-</ul>
-    <h3>Grafiki</h3>
+        <h3>Pracownicy</h3>
     <ul>
         <li class="menu-link"
-            data-url="{{ url_for('schedule_bp.list_schedules') }}">
+            data-url="{{ url_for('employee.list_employees') }}">
             Lista
         </li>
 
         <li class="menu-link"
-            data-url="{{ url_for('schedule_bp.add_schedule') }}">
+            data-url="{{ url_for('employee.add_employee_form') }}">
             Dodawanie
         </li>
+        <li class="menu-link"
+            data-url="{{ url_for('employee.add_time_off') }}">
+            Dodaj wolne
+        </li>
     </ul>
+        <h3>Grafiki</h3>
+        <ul>
+            <li class="menu-link"
+                data-url="{{ url_for('schedule_bp.list_schedules') }}">
+                Lista
+            </li>
 
+            <li class="menu-link"
+                data-url="{{ url_for('schedule_bp.add_schedule') }}">
+                Dodawanie
+            </li>
+        </ul>
+
+    </div>
+
+    <div id="main-content"></div>
 </div>
-
-<div id="main-content"></div>
-
 <script>
-const mainContent = document.getElementById('main-content');
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("SPA script loaded");
+    const mainContent = document.getElementById("main-content");
 
-document.querySelectorAll('.menu-link').forEach(el => {
-    el.addEventListener('click', (e) => {
+    function loadPage(url) {
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                mainContent.innerHTML = html;
+            });
+    }
 
-        e.preventDefault();   // ⭐ KLUCZOWE
-
-        const url = el.dataset.url;
-
-        mainContent.innerHTML =
-            `<iframe name="content-frame"
-                src="${url}"
-                style="width:100%; height:100%; border:none;"></iframe>`;
+    /* menu */
+    document.querySelectorAll(".menu-link").forEach(el => {
+        el.addEventListener("click", function (e) {
+            e.preventDefault();
+            loadPage(el.dataset.url);
+        });
     });
+
+
+document.addEventListener("submit", function (e) {
+
+    const form = e.target;
+    if (!form) return;
+
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: form.method || "POST",
+        body: formData
+    })
+    .then(response => {
+        // jeśli backend robi redirect
+        if (response.redirected) {
+            return fetch(response.url);
+        }
+        return response;
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById("main-content").innerHTML = html;
+    });
+
 });
+
+    /* globalne przechwytywanie kliknięć */
+    document.addEventListener("click", function (e) {
+
+        const link = e.target.closest("a");
+        if (!link) return;
+
+        /* tylko linki wewnętrzne */
+        if (link.hostname !== window.location.hostname) return;
+
+        /* nie przechwytuj anuluj / target blank */
+        if (link.target === "_blank") return;
+
+        e.preventDefault();
+        loadPage(link.href);
+    });
+
+});
+</script>
+<script>
+console.log("MAIN JS LOADED");
 </script>
 </body>
 </html>

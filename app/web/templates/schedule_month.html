@@ -1,9 +1,21 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
+</head>
+<body>
+
+
 {% set months = [
 "", "Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec",
 "Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"
 ] %}
-
+<div class="page">
 <div class="schedule-sticky-header">
     <h4 class="mb-0">
         Grafik {{ months[schedule.month] }} {{ schedule.year }}
@@ -13,6 +25,7 @@
     </h4>
 </div>
 
+<div class="schedule-table-wrapper">
 <table class="schedule-table">
 
     <!-- ===================================== -->
@@ -46,7 +59,7 @@
     {% for emp in matrix["employees"] %}
     <tr>
 
-        <td style="text-align:left;">
+        <td>
             {{ emp["first_name"] }} {{ emp["last_name"] }}
         </td>
 
@@ -62,7 +75,7 @@
     {% endfor %}
 
 </table>
-
+</div>
 {% if edit_day %}
 <hr>
 
@@ -85,5 +98,6 @@
 
     <button type="submit">Zapisz</button>
 </form>
-
 {% endif %}
+</body>
+</html>

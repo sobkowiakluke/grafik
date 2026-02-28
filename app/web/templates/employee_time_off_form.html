@@ -1,56 +1,40 @@
 <h2>Dodaj wolne</h2>
 
-<form method="post">
-
-    <div>
-        <label>Pracownik:</label><br>
-        <select name="employee_id" required>
-            <option value="">-- wybierz --</option>
-            {% for emp in employees %}
-                <option value="{{ emp.id }}">
-                    {{ emp.last_name }} {{ emp.first_name }}
-                </option>
+<form method="post" action="{{ url_for('employee.add_time_off') }}" class="form">
+    <div class="form-group">
+        <label for="employee_id">Pracownik</label>
+        <select name="employee_id" id="employee_id" required>
+            {% for e in employees %}
+            <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }}</option>
             {% endfor %}
         </select>
     </div>
 
-    <br>
-
-    <div>
-        <label>Od:</label><br>
-        <input type="date" name="date_from" required>
+    <div class="form-group">
+        <label for="date_from">Data od</label>
+        <input type="date" name="date_from" id="date_from" required>
     </div>
 
-    <br>
-
-    <div>
-        <label>Do:</label><br>
-        <input type="date" name="date_to" required>
+    <div class="form-group">
+        <label for="date_to">Data do</label>
+        <input type="date" name="date_to" id="date_to" required>
     </div>
+<div class="form-group">
+    <label for="reason_id">Przyczyna</label>
+    <select name="reason_id" id="reason_id" required>
+        {% for r in reasons %}
+        <option value="{{ r.id }}">{{ r.name }}</option>
+        {% endfor %}
+    </select>
+</div>
 
-    <br>
-
-    <div>
-        <label>Powód:</label><br>
-        <select name="reason_id" required>
-            <option value="">-- wybierz --</option>
-            {% for reason in reasons %}
-                <option value="{{ reason.id }}">
-                    {{ reason.name }}
-                </option>
-            {% endfor %}
-        </select>
+    <div class="form-actions">
+        <button type="submit" class="button">Zapisz</button>
+        <a href="{{ url_for('employee.list_employees') }}"
+           class="button button-secondary">
+            Anuluj
+        </a>
     </div>
-
-    <br>
-
-    <div>
-        <label>Notatka:</label><br>
-        <input type="text" name="notes" maxlength="256">
-    </div>
-
-    <br>
-
-    <button type="submit">Zapisz</button>
 
 </form>
+
