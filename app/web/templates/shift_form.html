@@ -1,0 +1,41 @@
+<div class="page">
+<h2>Nowa zmiana</h2>
+
+<form method="post" action="/shifts" class="form">
+    <div>
+        <label>Pracownik:</label>
+        <select name="employee_id">
+            <!-- później wypełnimy z backendu -->
+        </select>
+    </div>
+
+    <div>
+        <label>Data:</label>
+        <input type="date" name="shift_date" required>
+    </div>
+
+    <div>
+        <label>Od:</label>
+        <input type="time" name="start_time" required>
+    </div>
+
+    <div>
+        <label>Do:</label>
+        <input type="time" name="end_time" required>
+    </div>
+
+    <div>
+        <label>
+            <input type="checkbox" name="is_lead">
+            Prowadzi zmianę
+        </label>
+    </div>
+
+    <div>
+        <label>Notatka:</label>
+        <input type="text" name="note" maxlength="256">
+    </div>
+
+    <button type="submit">Zapisz</button>
+</form>
+</div>

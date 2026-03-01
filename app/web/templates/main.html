@@ -11,7 +11,7 @@
 <div id="layout">
     <div id="sidebar">
 
-        <h3>Pracownicy</h3>
+<h3>TEST_LAYOUT_123</h3>
     <ul>
         <li class="menu-link"
             data-url="{{ url_for('employee.list_employees') }}">
@@ -26,6 +26,10 @@
             data-url="{{ url_for('employee.add_time_off') }}">
             Dodaj wolne
         </li>
+<li class="menu-link"
+    data-url="{{ url_for('shift.new_shift') }}">
+    Nowa zmiana
+</li>
     </ul>
         <h3>Grafiki</h3>
         <ul>
@@ -63,14 +67,15 @@ document.querySelectorAll(".menu-link").forEach(el => {
 
         e.preventDefault();
 
-        /* usuń active ze wszystkich */
         document.querySelectorAll("#sidebar .menu-link")
             .forEach(li => li.classList.remove("active"));
 
-        /* dodaj active do klikniętego */
-        el.classList.add("active");
+        this.classList.add("active");
 
-        loadPage(el.dataset.url);
+        const url = this.dataset.url;
+        if (url) {
+            loadPage(url);
+        }
     });
 });
 

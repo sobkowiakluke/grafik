@@ -1,4 +1,4 @@
-
+from app.web.routes_shift import shift_bp
 from flask import Flask, redirect, url_for
 from flask_login import login_required
 
@@ -13,7 +13,6 @@ from app.web.auth import auth_bp   # ← TERAZ blueprint!
 app = Flask(__name__)
 app.secret_key = "change_me"
 
-
 # DB lifecycle
 app.teardown_appcontext(close_db)
 
@@ -27,12 +26,12 @@ login_manager.login_view = "auth.login"
 app.register_blueprint(auth_bp)
 app.register_blueprint(employee_bp, url_prefix="/employees")
 app.register_blueprint(schedule_bp, url_prefix="/schedules")
-
+app.register_blueprint(shift_bp)
 
 # Root
 
 from flask import render_template
-
+print(app.url_map)
 @app.route("/")
 @login_required
 def index():
