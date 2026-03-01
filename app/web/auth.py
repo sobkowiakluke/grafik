@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, UserMixin
 
 from app.web.extensions import login_manager
 from app.db.provider import get_db
-
+from werkzeug.security import check_password_hash
 
 # =====================================================
 # Blueprint
@@ -66,14 +66,19 @@ def login():
 
         if not user:
             flash("Nieprawidłowy login lub hasło", "danger")
-            return render_template("login.html")
+            return redirect(url_for("auth.login"))
+
+        from werkzeug.security import check_password_hash
+
+        if not check_password_hash(user["password"], password):
+            flash("Nieprawidłowy login lub hasło", "danger")
+            return redirect(url_for("auth.login"))
 
         login_user(User(user["id"], user["username"]))
-
         return redirect(url_for("index"))
 
+    # KLUCZOWE — musi być poza IF
     return render_template("login.html")
-
 
 # =====================================================
 # LOGOUT
