@@ -210,6 +210,23 @@ class ScheduleService:
 
         time_off_rows = cur.fetchall() or []
 
+
+        # =====================================
+        # SHIFTS (WORK)
+        # =====================================
+        cur.execute("""
+            SELECT employee_id, DAY(shift_date) AS day
+            FROM shifts
+            WHERE schedule_id = %s
+        """, (schedule_id,))
+
+        shift_rows = cur.fetchall()
+
+        for row in shift_rows:
+            emp_id = row["employee_id"]
+        day = row["day"]
+
+
         # budujemy mapę
         time_off_map = {}
 
@@ -223,11 +240,40 @@ class ScheduleService:
 
             time_off_map[emp_id].append((start, end))
 
-        cur.close()
+                # budujemy strukturę pod template
+        employees = []
+
+
+        cur.execute("""
+            SELECT employee_id, shift_date
+            FROM shifts
+            WHERE schedule_id = %s
+        """, (schedule_id,))
+
+        shift_rows = cur.fetchall()
+
+        shift_set = set(
+            (row["employee_id"], row["shift_date"])
+            for row in shift_rows
+        )
+
 
         # budujemy strukturę pod template
         employees = []
 
+
+        cur.execute("""
+            SELECT employee_id, shift_date
+            FROM shifts
+            WHERE schedule_id = %s
+        """, (schedule_id,))
+
+        shift_rows = cur.fetchall()
+
+        shift_set = set(
+            (row["employee_id"], row["shift_date"])
+            for row in shift_rows
+        )
 
 
         for emp in employees_raw:
@@ -245,28 +291,36 @@ class ScheduleService:
                 current_date = date(year, month, day_number)
 
                 is_time_off = False
+                is_work = False
+
+                if (emp["id"], current_date) in shift_set:
+                    is_work = True
 
                 if emp["id"] in time_off_map:
                     for start, end in time_off_map[emp["id"]]:
                         if start <= current_date <= end:
                             is_time_off = True
+                            is_work = False
                             break
 
                 if d["staff_from"] is None:
                     emp_row["days"][day_number] = {
                         "staff_from": None,
                         "store_close": None,
-                        "is_time_off": is_time_off
-                    }
+                        "is_time_off": is_time_off,
+                        "is_work": is_work
+                   }
                     continue
 
                 emp_row["days"][day_number] = {
                     "staff_from": str(d["staff_from"])[:5],
                     "store_close": str(d["store_close"])[:5],
-                    "is_time_off": is_time_off
+                    "is_time_off": is_time_off,
+                    "is_work": is_work
                 }
 
             employees.append(emp_row)
+            cur.close()
         return {
             "days": days,
             "employees": employees

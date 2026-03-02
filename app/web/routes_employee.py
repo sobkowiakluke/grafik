@@ -8,6 +8,95 @@ from app.services.employee_service import EmployeeService
 employee_bp = Blueprint("employee", __name__, template_folder="templates")
 
 
+
+@employee_bp.route(
+    "/employees/<int:employee_id>/time-off/<date_str>",
+    methods=["GET", "POST"]
+)
+@login_required
+def edit_time_off(employee_id, date_str):
+
+    from datetime import datetime
+    db = get_db()
+    cur = db.cursor()
+
+    selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+
+    # znajdź wpis obejmujący ten dzień
+    cur.execute("""
+        SELECT *
+        FROM employee_time_off
+        WHERE employee_id = %s
+          AND %s BETWEEN date_from AND date_to
+        LIMIT 1
+    """, (employee_id, selected_date))
+
+    row = cur.fetchone()
+
+    if not row:
+        cur.close()
+        flash("Brak wpisu wolnego dla tej daty.", "danger")
+        return redirect(request.referrer or url_for("schedule_bp.list_schedules"))
+
+
+
+
+    if request.method == "POST":
+
+        reason_id = request.form.get("reason_id")
+
+        if not reason_id:
+            flash("Wybierz przyczynę.", "danger")
+            return redirect(request.url)
+
+        date_from = request.form.get("date_from")
+        date_to = request.form.get("date_to")
+        notes = request.form.get("notes")
+
+        cur.execute("""
+             UPDATE employee_time_off
+             SET date_from=%s,
+                 date_to=%s,
+                 notes=%s,
+                 reason_id=%s
+             WHERE id=%s
+        """, (date_from, date_to, notes, reason_id, row["id"]))
+
+        db.commit()
+        cur.close()
+
+        flash("Wolne zaktualizowane.", "success")
+
+        back = request.form.get("back")
+
+        return redirect(
+            back or url_for("schedule_bp.schedule_details",
+                            schedule_id=request.args.get("schedule_id"))
+        )
+
+    cur.close()
+    cur = db.cursor()
+    cur.execute("SELECT id, name FROM time_off_reasons ORDER BY name")
+    reasons = cur.fetchall()
+    cur.close()
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template(
+            "time_off_form_partial.html",
+            time_off=row,
+            employee_id=employee_id,
+            selected_date=selected_date,
+            reasons=reasons,
+        )
+    return render_template(
+        "time_off_form.html",
+        time_off=row,
+        employee_id=employee_id,
+        selected_date=selected_date,
+        reasons=reasons,
+        back=request.args.get("back")
+    )
+
 def get_employee_service():
     return EmployeeService(get_db())
 
@@ -170,3 +259,5 @@ def add_time_off():
     cur.close()
 
     return "Zapisano poprawnie"
+
+

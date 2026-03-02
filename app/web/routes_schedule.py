@@ -54,7 +54,7 @@ def schedule_details(schedule_id):
     service = get_schedule_service()
 
     edit_day = request.args.get("edit_day", type=int)
-
+    edit_time_off = request.args.get("edit_time_off")
     # =====================================
     # ZAPIS GODZIN (POST)
     # =====================================
@@ -89,14 +89,57 @@ def schedule_details(schedule_id):
                 day_data = d
                 break
 
+    edit_time_off = request.args.get("edit_time_off")
+
+    employee = None
+    selected_date = None
+    time_off = None
+    reasons = []
+
+    if edit_time_off:
+        emp_id_str, day_str = edit_time_off.split("-")
+        employee_id = int(emp_id_str)
+        day = int(day_str)
+
+        from datetime import date
+        selected_date = date(schedule["year"], schedule["month"], day)
+
+        db = get_db()
+        cur = db.cursor()
+
+        # pracownik
+        cur.execute("SELECT * FROM employees WHERE id=%s", (employee_id,))
+        employee = cur.fetchone()
+
+        # wpis wolnego
+        cur.execute("""
+            SELECT *
+            FROM employee_time_off
+            WHERE employee_id=%s
+              AND %s BETWEEN date_from AND date_to
+            LIMIT 1
+        """, (employee_id, selected_date))
+        time_off = cur.fetchone()
+
+        # lista przyczyn
+        cur.execute("SELECT id, name FROM time_off_reasons ORDER BY name")
+        reasons = cur.fetchall()
+
+        cur.close()
+
+
     return render_template(
         "schedule_month.html",
         schedule=schedule,
         matrix=matrix,
         edit_day=edit_day,
-        day_data=day_data
+        day_data=day_data,
+        edit_time_off=edit_time_off,
+        employee=employee,
+        selected_date=selected_date,
+        time_off=time_off,
+        reasons=reasons
     )
-
 
 # =====================================================
 # Widok miesiąca

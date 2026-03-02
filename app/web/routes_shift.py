@@ -130,3 +130,31 @@ def create_shift():
             schedule_id=schedule_id
         )
     )
+
+
+@shift_bp.route("/<int:shift_id>/edit", methods=["GET"])
+@login_required
+def edit_shift(shift_id):
+
+    db = get_db()
+    cur = db.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM shifts
+        WHERE id = %s
+    """, (shift_id,))
+
+    shift = cur.fetchone()
+    cur.close()
+
+    if not shift:
+        flash("Zmiana nie istnieje.", "danger")
+        return redirect(url_for("schedule_bp.list_schedules"))
+
+    # używamy tego samego template co przy new
+    return render_template(
+        "shift_form.html",
+        shift=shift,
+        edit_mode=True
+    )

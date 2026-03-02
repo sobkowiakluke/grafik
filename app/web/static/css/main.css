@@ -11,8 +11,8 @@
 
     --accent: #4da3ff;
     --danger: #ff5c5c;
+    --success: #22c55e;
 }
-
 /* Reset bazowy */
 
 #main-content iframe {
@@ -65,28 +65,13 @@ body {
     background: #f5f6f8;
     overflow: auto;
 }
-/*
-.schedule-table {
-    border-collapse: collapse;
+.table td a {
+    display: block;
+    padding: 8px 10px;
     width: 100%;
-    text-align: center;
+    height: 100%;
 }
 
-.schedule-table th,
-.schedule-table td {
-    border: 1px solid #999;
-    padding: 4px 6px;
-}
-
-.schedule-table th {
-    background-color: #f2f2f2;
-    font-weight: 600;
-}
-
-.schedule-table td.time-off {
-    background-color: #ff4d4d;
-}
-*/
 table td.time-off {
     background-color: #ff4d4d !important;
     color: #000 !important;
@@ -118,6 +103,7 @@ table td.time-off {
 }
 
 .table {
+    padding: 0;
     width: 100%;
     border-collapse: collapse;
     background: var(--bg-table);
@@ -128,7 +114,7 @@ table td.time-off {
 .table th,
 .table td {
     border: 1px solid var(--border-color);
-    padding: 8px 10px;
+    padding: 0;
 }
 
 .table thead th {
@@ -216,4 +202,46 @@ select:focus {
 
 #main-content iframe {
     background: var(--bg-main);
+}
+
+.work {
+    background-color: #2e7d32;
+    color: #ffffff;
+}
+
+.work-day {
+    background-color: #2ecc71;
+    color: #ffffff;
+    text-align: center;
+    font-weight: 600;
+}
+
+.work-day:hover {
+    filter: brightness(0.95);
+}
+/* ============================= */
+/* EMPLOYEE TABLE                */
+/* ============================= */
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: var(--bg-table);
+}
+
+.employee-table th,
+.employee-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    text-align: left;
+}
+
+.employee-table thead th {
+    background: var(--bg-panel);
+    font-weight: 600;
+}
+
+.employee-table tbody tr:hover {
+    background: var(--bg-hover);
 }

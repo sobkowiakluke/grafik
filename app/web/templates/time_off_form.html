@@ -1,0 +1,57 @@
+<div class="page">
+
+    <h3>Edycja wolnego</h3>
+
+    <div class="form">
+        <form method="POST">
+
+            {% if back %}
+                <input type="hidden" name="back" value="{{ back }}">
+            {% endif %}
+
+            <div class="form-row">
+                <label>Od</label>
+                <input type="date"
+                       name="date_from"
+                       value="{{ time_off.date_from }}">
+            </div>
+
+            <div class="form-row">
+                <label>Do</label>
+                <input type="date"
+                       name="date_to"
+                       value="{{ time_off.date_to }}">
+            </div>
+
+<div class="form-group">
+    <label for="reason_id">Przyczyna</label>
+    <select name="reason_id" id="reason_id" required>
+        <option value="">-- wybierz --</option>
+
+        {% for r in reasons %}
+            <option value="{{ r.id }}"
+                {% if time_off.reason_id == r.id %}
+                    selected
+                {% endif %}
+            >
+                {{ r.name }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+
+            <div class="form-row">
+                <label>Notatka</label>
+                <input type="text"
+                       name="notes"
+                       value="{{ time_off.notes or '' }}">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Zapisz</button>
+            </div>
+
+        </form>
+    </div>
+
+</div>

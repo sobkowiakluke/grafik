@@ -13,7 +13,7 @@
 </div>
 
 <div class="schedule-table-wrapper">
-<table class="table">
+<table class="schedule-table">
 
     <!-- ===================================== -->
     <!-- NAGŁÓWEK DNI + GODZINY SKLEPU -->
@@ -54,9 +54,26 @@
 
             {% set cell = emp.days[d["day"]] %}
 
-            <td class="{% if cell.is_time_off %}time-off{% endif %}">
-            </td>
-         {% endfor %}
+
+        <td class="
+            {% if cell.is_time_off %}
+            time-off
+            {% elif cell.is_work %}
+                work-day
+            {% endif %}
+        ">
+            {% if cell.is_time_off %}
+                   <a class="cell-link"
+               href="{{ url_for(
+                        'schedule_bp.schedule_details',
+                        schedule_id=schedule.id,
+                        edit_time_off=emp.id ~ '-' ~ d['day']
+                    ) }}">
+               </a>
+            {% endif %}
+        </td>
+
+        {% endfor %}
 
     </tr>
     {% endfor %}
@@ -86,3 +103,102 @@
     <button type="submit">Zapisz</button>
 </form>
 {% endif %}
+
+
+{% if edit_time_off %}
+<hr>
+
+<h5>
+    Edycja wolnego —
+    {{ employee.first_name }} {{ employee.last_name }}
+    ({{ selected_date.strftime("%d.%m.%Y") }})
+</h5>
+
+<form method="post"
+      action="{{ url_for('employee.edit_time_off',
+                         employee_id=employee.id,
+                         date_str=selected_date.strftime('%Y-%m-%d')) }}">
+
+    <div>
+        <label>Od:</label>
+        <input type="date"
+               name="date_from"
+               value="{{ time_off.date_from }}">
+    </div>
+
+    <div>
+        <label>Do:</label>
+        <input type="date"
+               name="date_to"
+               value="{{ time_off.date_to }}">
+    </div>
+
+    <div>
+        <label>Przyczyna:</label>
+        <select name="reason_id" required>
+            <option value="">-- wybierz --</option>
+            {% for r in reasons %}
+                <option value="{{ r.id }}"
+                    {% if time_off.reason_id == r.id %}selected{% endif %}>
+                    {{ r.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label>Uwagi:</label>
+        <input type="text"
+               name="notes"
+               value="{{ time_off.notes or '' }}">
+    </div>
+
+    <div style="margin-top:10px;">
+        <button type="submit">Zapisz</button>
+        <a href="{{ url_for('schedule_bp.schedule_details',
+                            schedule_id=schedule.id) }}">
+            Anuluj
+        </a>
+    </div>
+
+    <input type="hidden"
+           name="back"
+           value="{{ url_for('schedule_bp.schedule_details',
+                             schedule_id=schedule.id) }}">
+
+</form>
+{% endif %}
+
+
+<div id="inline-editor"></div>
+
+
+
+<script>
+console.log("schedule js loaded");
+
+document.querySelectorAll(".schedule-table td.time-off").forEach(cell => {
+
+    cell.addEventListener("click", function () {
+
+        const url = this.dataset.url;
+        if (!url) return;
+
+        fetch(url, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById("inline-editor").innerHTML = html;
+            window.scrollTo({
+                top: document.getElementById("inline-editor").offsetTop - 20,
+                behavior: "smooth"
+            });
+        });
+
+    });
+
+});
+</script>

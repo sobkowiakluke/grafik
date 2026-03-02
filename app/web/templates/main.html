@@ -4,14 +4,14 @@
 
     <meta charset="UTF-8">
     <title>Panel grafiku</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=5">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/schedule.css') }}">
 </head>
 <body>
 <div id="layout">
     <div id="sidebar">
 
-<h3>TEST_LAYOUT_123</h3>
+<h3>Pracownicy</h3>
     <ul>
         <li class="menu-link"
             data-url="{{ url_for('employee.list_employees') }}">
