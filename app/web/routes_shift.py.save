@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.db.provider import get_db
-from app.services.shift_service import is_employee_available
+
 
 shift_bp = Blueprint("shift", __name__, url_prefix="/shifts")
 
@@ -51,6 +51,8 @@ def create_shift():
     start_time = request.form.get("start_time")
     end_time = request.form.get("end_time")
 
+    
+
     if not schedule_id:
         flash("Wybierz grafik", "danger")
         return redirect(url_for("shift.new_shift"))
@@ -87,21 +89,6 @@ def create_shift():
         flash("Data nie należy do wybranego miesiąca grafiku", "danger")
         cur.close()
         return redirect(url_for("shift.new_shift"))
-
-    is_ok, error = is_employee_available(
-        db,
-        employee_id,
-        shift_date,
-        start_time,
-        end_time
-    )
-
-    if not is_ok:
-        flash(error, "danger")
-        cur.close()
-        return redirect(url_for("shift.new_shift"))
-
-
 
     # --- INSERT ---
     cur.execute("""

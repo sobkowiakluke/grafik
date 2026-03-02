@@ -1,41 +1,87 @@
 <div class="page">
-<h2>Nowa zmiana</h2>
 
-<form method="post" action="/shifts" class="form">
-    <div>
-        <label>Pracownik:</label>
-        <select name="employee_id">
-            <!-- później wypełnimy z backendu -->
-        </select>
+    <h2>Dodaj zmianę</h2>
+
+    <div class="form">
+        <form method="POST" action="{{ url_for('shift.create_shift') }}">
+
+            <div class="form-row">
+                <label>Grafik</label>
+                <select name="schedule_id" required id="schedule_select">
+                    <option value="">-- wybierz grafik --</option>
+                    {% for s in schedules %}
+                        <option value="{{ s.id }}">
+                            {{ s.year }}-{{ "%02d"|format(s.month) }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Pracownik</label>
+                <select name="employee_id" required>
+                    <option value="">-- wybierz pracownika --</option>
+                    {% for e in employees %}
+                        <option value="{{ e.id }}">
+                            {{ e.last_name }} {{ e.first_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>Data</label>
+                <input type="date" name="work_date" required id="shift_date">
+            </div>
+
+            <div class="form-row">
+                <label>Godzina od</label>
+                <input type="time" name="start_time" required>
+            </div>
+
+            <div class="form-row">
+                <label>Godzina do</label>
+                <input type="time" name="end_time" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit">Zapisz zmianę</button>
+            </div>
+
+        </form>
     </div>
 
-    <div>
-        <label>Data:</label>
-        <input type="date" name="shift_date" required>
-    </div>
-
-    <div>
-        <label>Od:</label>
-        <input type="time" name="start_time" required>
-    </div>
-
-    <div>
-        <label>Do:</label>
-        <input type="time" name="end_time" required>
-    </div>
-
-    <div>
-        <label>
-            <input type="checkbox" name="is_lead">
-            Prowadzi zmianę
-        </label>
-    </div>
-
-    <div>
-        <label>Notatka:</label>
-        <input type="text" name="note" maxlength="256">
-    </div>
-
-    <button type="submit">Zapisz</button>
-</form>
 </div>
+<script>
+const scheduleSelect = document.getElementById("schedule_select");
+const dateInput = document.getElementById("shift_date");
+
+scheduleSelect.addEventListener("change", function() {
+
+    const selected = this.options[this.selectedIndex].text.trim();
+    if (!selected.includes("-")) return;
+
+    const parts = selected.split("-");
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]);
+
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+
+    const minDate = firstDay.toISOString().split("T")[0];
+    const maxDate = lastDay.toISOString().split("T")[0];
+
+    dateInput.min = minDate;
+    dateInput.max = maxDate;
+
+    // jeśli już wybrana data jest poza zakresem → wyczyść
+    if (dateInput.value && (dateInput.value < minDate || dateInput.value > maxDate)) {
+        dateInput.value = "";
+    }
+
+    console.log("min:", minDate);
+    console.log("max:", maxDate);
+});
+</script>
+</script>
+
