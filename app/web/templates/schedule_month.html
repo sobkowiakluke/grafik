@@ -55,23 +55,39 @@
             {% set cell = emp.days[d["day"]] %}
 
 
+
         <td class="
             {% if cell.is_time_off %}
-            time-off
+                time-off
             {% elif cell.is_work %}
                 work-day
             {% endif %}
         ">
+
             {% if cell.is_time_off %}
-                   <a class="cell-link"
-               href="{{ url_for(
-                        'schedule_bp.schedule_details',
-                        schedule_id=schedule.id,
-                        edit_time_off=emp.id ~ '-' ~ d['day']
-                    ) }}">
-               </a>
+                <a class="cell-link"
+                    href="{{ url_for(
+                            'schedule_bp.schedule_details',
+                            schedule_id=schedule.id,
+                            edit_time_off=emp.id ~ '-' ~ d['day']
+                         ) }}">
+                </a>
+
+            {% elif cell.is_work %}
+                <a class="cell-link"
+                   href="{{ url_for(
+                            'schedule_bp.schedule_details',
+                            schedule_id=schedule.id,
+                            edit_shift=emp.id ~ '-' ~ d['day']
+                        ) }}">
+                </a>
             {% endif %}
+
         </td>
+
+
+
+
 
         {% endfor %}
 
@@ -168,37 +184,53 @@
 
 </form>
 {% endif %}
+{% if edit_shift %}
+<hr>
 
+<h5>
+    Zmiana —
+    {{ shift_emp_id }}
+    (dzień {{ shift_day }})
+</h5>
+
+<form method="post"
+      action="{{ url_for('schedule_bp.schedule_details',
+                         schedule_id=schedule.id,
+                         edit_shift=shift_emp_id ~ '-' ~ shift_day) }}">
+
+    <input type="hidden" name="employee_id" value="{{ shift_emp_id }}">
+    <input type="hidden" name="day" value="{{ shift_day }}">
+    <input type="hidden" name="shift_id" value="{{ shift.id }}">
+
+    <div>
+        <label>Start:</label>  
+        <input type="time"
+           name="start"
+           value="{{ '%02d:%02d' % (shift.start_time.seconds // 3600, (shift.start_time.seconds // 60) % 60) if shift else '' }}">
+
+
+
+    </div>
+
+    <div>
+        <label>Koniec:</label>
+        <input type="time"
+           name="end"
+           value="{{ '%02d:%02d' % (shift.end_time.seconds // 3600, (shift.end_time.seconds // 60) % 60) if shift else '' }}">
+    </div>
+
+    <div style="margin-top:10px;">
+        <button type="submit">Zapisz</button>
+        <a href="{{ url_for('schedule_bp.schedule_details',
+                            schedule_id=schedule.id) }}">
+            Anuluj
+        </a>
+    </div>
+
+</form>
+{% endif %}
 
 <div id="inline-editor"></div>
 
 
 
-<script>
-console.log("schedule js loaded");
-
-document.querySelectorAll(".schedule-table td.time-off").forEach(cell => {
-
-    cell.addEventListener("click", function () {
-
-        const url = this.dataset.url;
-        if (!url) return;
-
-        fetch(url, {
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
-        })
-        .then(r => r.text())
-        .then(html => {
-            document.getElementById("inline-editor").innerHTML = html;
-            window.scrollTo({
-                top: document.getElementById("inline-editor").offsetTop - 20,
-                behavior: "smooth"
-            });
-        });
-
-    });
-
-});
-</script>

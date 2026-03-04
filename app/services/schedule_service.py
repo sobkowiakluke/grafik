@@ -340,3 +340,18 @@ class ScheduleService:
             staff_from,
             store_close
         )
+
+
+    def edit_shift(self, shift_id, start, end):
+
+        cur = self.db.cursor()
+
+        cur.execute("""
+            UPDATE shifts
+            SET start_time=%s,
+                end_time=%s
+            WHERE id=%s
+        """, (start, end, shift_id))
+
+        self.db.commit()
+        cur.close()
