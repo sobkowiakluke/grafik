@@ -1,3 +1,4 @@
+
 from calendar import monthrange
 from datetime import datetime, date
 
@@ -6,6 +7,18 @@ from app.services.schedule_day_service import ScheduleDayService
 
 
 class ScheduleService:
+
+    def delete_shift(self, shift_id):
+
+        cur = self.db.cursor()
+
+        cur.execute(
+            "DELETE FROM shifts WHERE id = %s",
+            (shift_id,)
+        )
+        self.db.commit()
+        cur.close()
+
 
     def __init__(self, db: Database, day_service: ScheduleDayService):
         self.db = db
@@ -312,3 +325,26 @@ class ScheduleService:
 
         self.db.commit()
         cur.close()
+
+    def get_employee_hours(self, schedule_id):
+        cur = self.db.cursor()
+        cur.execute("""
+            SELECT
+                employee_id,
+                SUM(TIMESTAMPDIFF(MINUTE, start_time, end_time)) AS minutes
+            FROM shifts
+            WHERE schedule_id = %s
+            GROUP BY employee_id
+        """, (schedule_id,))
+        rows = cur.fetchall()
+        cur.close()
+
+        result = {}
+
+        for r in rows:
+            total_minutes = r["minutes"] or 0
+            hours = int(total_minutes // 60)
+            minutes = int(total_minutes % 60)
+            result[r["employee_id"]] = f"{hours}:{minutes:02d}"
+
+        return result

@@ -20,7 +20,7 @@
     <!-- ===================================== -->
     <tr>
         <th>Pracownik</th>
-
+        <th>Ilość godzin</th>
         {% for d in matrix["days"] %}
         <th>
             <a href="{{ url_for('schedule_bp.schedule_details',
@@ -49,7 +49,9 @@
         <td>
             {{ emp["first_name"] }} {{ emp["last_name"] }}
         </td>
-
+        <td class="hours-cell">
+            {{ hours.get(emp.id, 0) }}
+        </td>
 
         {% for d in matrix["days"] %}
 
@@ -199,42 +201,60 @@
     (dzień {{ shift_day }})
 </h5>
 
+<!-- FORMULARZ EDYCJI -->
 <form method="post"
       action="{{ url_for('schedule_bp.schedule_details',
                          schedule_id=schedule.id,
                          edit_shift=shift_emp_id ~ '-' ~ shift_day) }}">
 
+    <input type="hidden" name="shift_id" value="{{ shift.id }}">
     <input type="hidden" name="employee_id" value="{{ shift_emp_id }}">
     <input type="hidden" name="day" value="{{ shift_day }}">
-    <input type="hidden" name="shift_id" value="{{ shift.id }}">
 
     <div>
-        <label>Start:</label>  
+        <label>Start:</label>
         <input type="time"
-           name="start"
-           value="{{ '%02d:%02d' % (shift.start_time.seconds // 3600, (shift.start_time.seconds // 60) % 60) if shift else '' }}">
-
-
-
+               name="start"
+               value="{{ '%02d:%02d' % (shift.start_time.seconds // 3600, (shift.start_time.seconds // 60) % 60) if shift else '' }}">
     </div>
 
     <div>
         <label>Koniec:</label>
         <input type="time"
-           name="end"
-           value="{{ '%02d:%02d' % (shift.end_time.seconds // 3600, (shift.end_time.seconds // 60) % 60) if shift else '' }}">
+               name="end"
+               value="{{ '%02d:%02d' % (shift.end_time.seconds // 3600, (shift.end_time.seconds // 60) % 60) if shift else '' }}">
     </div>
 
-    <div style="margin-top:10px;">
-        <button type="submit">Zapisz</button>
-        <a href="{{ url_for('schedule_bp.schedule_details',
-                            schedule_id=schedule.id) }}">
-            Anuluj
-        </a>
-    </div>
+    <button type="submit">Zapisz</button>
 
 </form>
+
+
+<!-- FORMULARZ USUWANIA -->
+<form method="post"
+      action="{{ url_for('schedule_bp.schedule_details',
+                         schedule_id=schedule.id,
+                         edit_shift=shift_emp_id ~ '-' ~ shift_day) }}"
+      style="margin-top:10px;">
+
+    <input type="hidden" name="shift_id" value="{{ shift.id }}">
+    <input type="hidden" name="delete_shift" value="1">
+
+    <button type="submit"
+            onclick="return confirm('Usunąć zmianę?');">
+        Usuń
+    </button>
+
+</form>
+
+<a href="{{ url_for('schedule_bp.schedule_details',
+                    schedule_id=schedule.id) }}">
+    Anuluj
+</a>
+
 {% endif %}
+
+
 
 <div id="inline-editor"></div>
 

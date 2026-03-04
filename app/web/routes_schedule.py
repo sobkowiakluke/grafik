@@ -92,32 +92,42 @@ def schedule_details(schedule_id):
     # =====================================
     # ZAPIS ZMIANY
     # =====================================
-    if request.method == "POST" and edit_shift:
 
+    if request.method == "POST" and edit_shift:
+        print("FORM:", dict(request.form))
         shift_id = request.form.get("shift_id")
+
+        # usuwanie
+        if request.form.get("delete_shift"):
+
+            service.delete_shift(shift_id)
+
+            return redirect(url_for(
+                "schedule_bp.schedule_details",
+                schedule_id=schedule_id
+            ))
+
+        # zapis (domyślny)
         start = request.form.get("start")
         end = request.form.get("end")
 
-        if shift_id:
-            service.edit_shift(
-                shift_id,
-                start,
-                end
-            )
+        service.edit_shift(
+            shift_id,
+            start,
+            end
+        )
 
         return redirect(url_for(
             "schedule_bp.schedule_details",
             schedule_id=schedule_id
         ))
 
-
-
-
     # =====================================
     # POBRANIE DANYCH GRAFIKU
     # =====================================
     schedule = service.get_schedule(schedule_id)
     matrix = service.get_month_matrix(schedule_id)
+    hours = service.get_employee_hours(schedule_id)
 
     # =====================================
     # DANE DNIA
@@ -200,6 +210,7 @@ def schedule_details(schedule_id):
         "schedule_month.html",
         schedule=schedule,
         matrix=matrix,
+        hours=hours,
         edit_day=edit_day,
         day_data=day_data,
         edit_time_off=edit_time_off,

@@ -30,3 +30,15 @@ def is_employee_available(db, employee_id, shift_date, start_time, end_time):
 
     cur.close()
     return True, None
+
+def delete_shift(self, shift_id):
+
+    cur = self.db.cursor()
+
+    cur.execute("""
+        DELETE FROM shifts
+        WHERE id = %s
+    """, (shift_id,))
+
+    self.db.commit()
+    cur.close()
