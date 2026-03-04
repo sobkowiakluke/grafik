@@ -50,46 +50,52 @@
             {{ emp["first_name"] }} {{ emp["last_name"] }}
         </td>
 
+
         {% for d in matrix["days"] %}
 
             {% set cell = emp.days[d["day"]] %}
 
-
-
-        <td class="
-            {% if cell.is_time_off %}
+            <td class="
+                {% if cell.is_time_off %}
                 time-off
-            {% elif cell.is_work %}
-                work-day
-            {% endif %}
-        ">
-
-            {% if cell.is_time_off %}
-                <a class="cell-link"
-                    href="{{ url_for(
+                {% elif cell.is_work %}
+                    work-day
+                {% endif %}
+            ">
+ 
+                {% if cell.is_time_off %}
+                    <a class="cell-link"
+                       href="{{ url_for(
                             'schedule_bp.schedule_details',
                             schedule_id=schedule.id,
                             edit_time_off=emp.id ~ '-' ~ d['day']
-                         ) }}">
-                </a>
+                       ) }}">
+                    </a>
 
-            {% elif cell.is_work %}
-                <a class="cell-link"
-                   href="{{ url_for(
+                {% elif cell.is_work %}
+                    <a class="cell-link"
+                       href="{{ url_for(
                             'schedule_bp.schedule_details',
                             schedule_id=schedule.id,
                             edit_shift=emp.id ~ '-' ~ d['day']
-                        ) }}">
-                </a>
-            {% endif %}
+                       ) }}">
 
-        </td>
+                        {% if cell.start %}
+                            {{ "%02d:%02d"|format(cell.start.seconds // 3600, (cell.start.seconds // 60) % 60) }}
+                            -
+                            {{ "%02d:%02d"|format(cell.end.seconds // 3600, (cell.end.seconds // 60) % 60) }}
+                        {% endif %}
+
+                    </a>
+                {% endif %}
+
+    </td>
+
+{% endfor %}
 
 
 
 
-
-        {% endfor %}
 
     </tr>
     {% endfor %}

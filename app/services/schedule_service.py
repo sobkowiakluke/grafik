@@ -1,11 +1,12 @@
-from flask import request
 from calendar import monthrange
 from datetime import datetime, date
+
 from app.db.connection import Database
 from app.services.schedule_day_service import ScheduleDayService
 
 
 class ScheduleService:
+
     def __init__(self, db: Database, day_service: ScheduleDayService):
         self.db = db
         self.day_service = day_service
@@ -14,6 +15,7 @@ class ScheduleService:
     # TWORZENIE GRAFIKU
     # --------------------------------------------------
     def create_schedule(self, year: int, month: int):
+
         last_day = monthrange(year, month)[1]
 
         start_dt = datetime(year, month, 1, 0, 0, 0)
@@ -21,7 +23,6 @@ class ScheduleService:
 
         cur = self.db.cursor()
 
-        # kolejna wersja grafiku
         cur.execute(
             "SELECT MAX(version) AS max_v FROM schedules WHERE year=%s AND month=%s",
             (year, month)
@@ -30,19 +31,16 @@ class ScheduleService:
 
         version = 1 if row["max_v"] is None else row["max_v"] + 1
 
-        cur.execute(
-            """
+        cur.execute("""
             INSERT INTO schedules (year, month, version, status, start_datetime, end_datetime)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (year, month, version, 'draft', start_dt, end_dt)
-        )
+            VALUES (%s,%s,%s,%s,%s,%s)
+        """, (year, month, version, "draft", start_dt, end_dt))
 
         schedule_id = cur.lastrowid
         self.db.commit()
 
-        # tworzenie dni grafiku
         for day_num in range(1, last_day + 1):
+
             day_date = date(year, month, day_num)
 
             if day_date.weekday() == 6:
@@ -51,11 +49,10 @@ class ScheduleService:
                 self.day_service.add_day(schedule_id, day_num, "05:00", "23:00")
 
         cur.close()
-        print(f"Grafik {year}-{month:02d} utworzony. ID={schedule_id}")
         return schedule_id
 
     # --------------------------------------------------
-    # LISTA GRAFIKÓW (WEBUI)
+    # LISTA GRAFIKÓW
     # --------------------------------------------------
     def list_schedules(self, sort="year", order="desc"):
 
@@ -70,7 +67,6 @@ class ScheduleService:
         order_sql = "ASC" if order.lower() == "asc" else "DESC"
 
         if sort == "year":
-            # chronologiczne sortowanie: rok + miesiąc + wersja
             order_clause = f"year {order_sql}, month {order_sql}, version {order_sql}"
         else:
             sort_column = allowed_fields.get(sort, "year")
@@ -86,58 +82,52 @@ class ScheduleService:
         cur.execute(sql)
         rows = cur.fetchall()
         cur.close()
+
         return rows or []
 
-
     # --------------------------------------------------
-    # POBRANIE JEDNEGO GRAFIKU
+    # POBRANIE GRAFIKU
     # --------------------------------------------------
     def get_schedule(self, schedule_id: int):
+
         cur = self.db.cursor()
         cur.execute(
             "SELECT * FROM schedules WHERE id=%s",
             (schedule_id,)
         )
+
         row = cur.fetchone()
         cur.close()
+
         return row
 
     # --------------------------------------------------
-    # USUWANIE GRAFIKU
-    # --------------------------------------------------
-    def delete_schedule(self, schedule_id: int):
-        cur = self.db.cursor()
-        cur.execute("DELETE FROM schedule_days WHERE schedule_id=%s", (schedule_id,))
-        cur.execute("DELETE FROM schedules WHERE id=%s", (schedule_id,))
-        self.db.commit()
-        cur.close()
-        print("Grafik usunięty.")
-
-    # --------------------------------------------------
-    # LISTA DNI (WEBUI)
+    # LISTA DNI
     # --------------------------------------------------
     def list_days(self, schedule_id: int):
+
         cur = self.db.cursor()
-        cur.execute(
-            """
+
+        cur.execute("""
             SELECT day, staff_from, store_close
             FROM schedule_days
             WHERE schedule_id=%s
             ORDER BY day
-            """,
-            (schedule_id,)
-        )
+        """, (schedule_id,))
+
         rows = cur.fetchall()
         cur.close()
+
         return rows or []
 
     # --------------------------------------------------
-    # MACIERZ MIESIĄCA (WEBUI GRID)
+    # MACIERZ GRAFIKU (GRID)
     # --------------------------------------------------
     def get_month_matrix(self, schedule_id: int):
 
         cur = self.db.cursor()
-        # pobierz rok i miesiąc grafiku
+
+        # rok i miesiąc
         cur.execute(
             "SELECT year, month FROM schedules WHERE id=%s",
             (schedule_id,)
@@ -146,6 +136,7 @@ class ScheduleService:
 
         year = schedule_row["year"]
         month = schedule_row["month"]
+
         # dni grafiku
         cur.execute("""
             SELECT day, staff_from, store_close
@@ -153,26 +144,33 @@ class ScheduleService:
             WHERE schedule_id=%s
             ORDER BY day
         """, (schedule_id,))
+
         days_raw = cur.fetchall() or []
 
-        # konwersja timedelta -> HH:MM
+        def td_to_hhmm(td):
+
+            if td is None:
+                return None
+
+            total = int(td.total_seconds())
+            h = total // 3600
+            m = (total % 3600) // 60
+
+            return f"{h:02d}:{m:02d}"
+
         days = []
 
         for d in days_raw:
 
             if d["staff_from"] is None:
+
                 days.append({
                     "day": d["day"],
                     "staff_from": None,
                     "store_close": None
                 })
-                continue
 
-            def td_to_hhmm(td):
-                total = int(td.total_seconds())
-                h = total // 3600
-                m = (total % 3600) // 60
-                return f"{h:02d}:{m:02d}"
+                continue
 
             days.append({
                 "day": d["day"],
@@ -180,101 +178,56 @@ class ScheduleService:
                 "store_close": td_to_hhmm(d["store_close"])
             })
 
-        # aktywni pracownicy
+        # pracownicy
         cur.execute("""
             SELECT id, first_name, last_name
             FROM employees
             WHERE active=1
             ORDER BY id
         """)
+
         employees_raw = cur.fetchall() or []
 
-
-
-        # zakres miesiąca
-        from datetime import date
-        from calendar import monthrange
-
+        # wolne
         start_date = date(year, month, 1)
-        last_day = monthrange(year, month)[1]
-        end_date = date(year, month, last_day)
+        end_date = date(year, month, monthrange(year, month)[1])
 
-        # pobierz wolne w tym miesiącu
         cur.execute("""
             SELECT employee_id, date_from, date_to
             FROM employee_time_off
-            WHERE NOT (
-                date_to < %s OR date_from > %s
-            )
+            WHERE NOT (date_to < %s OR date_from > %s)
         """, (start_date, end_date))
 
         time_off_rows = cur.fetchall() or []
 
-
-        # =====================================
-        # SHIFTS (WORK)
-        # =====================================
-        cur.execute("""
-            SELECT employee_id, DAY(shift_date) AS day
-            FROM shifts
-            WHERE schedule_id = %s
-        """, (schedule_id,))
-
-        shift_rows = cur.fetchall()
-
-        for row in shift_rows:
-            emp_id = row["employee_id"]
-        day = row["day"]
-
-
-        # budujemy mapę
         time_off_map = {}
 
         for row in time_off_rows:
+
             emp_id = row["employee_id"]
-            start = row["date_from"]
-            end = row["date_to"]
 
             if emp_id not in time_off_map:
                 time_off_map[emp_id] = []
 
-            time_off_map[emp_id].append((start, end))
+            time_off_map[emp_id].append(
+                (row["date_from"], row["date_to"])
+            )
 
-                # budujemy strukturę pod template
-        employees = []
-
-
+        # zmiany
         cur.execute("""
-            SELECT employee_id, shift_date
+            SELECT employee_id, shift_date, start_time, end_time
             FROM shifts
-            WHERE schedule_id = %s
+            WHERE schedule_id=%s
         """, (schedule_id,))
 
-        shift_rows = cur.fetchall()
+        shift_rows = cur.fetchall() or []
 
-        shift_set = set(
-            (row["employee_id"], row["shift_date"])
+        shift_map = {
+            (row["employee_id"], row["shift_date"]): row
             for row in shift_rows
-        )
+        }
 
-
-        # budujemy strukturę pod template
         employees = []
-
-
-        cur.execute("""
-            SELECT employee_id, shift_date
-            FROM shifts
-            WHERE schedule_id = %s
-        """, (schedule_id,))
-
-        shift_rows = cur.fetchall()
-
-        shift_set = set(
-            (row["employee_id"], row["shift_date"])
-            for row in shift_rows
-        )
-
 
         for emp in employees_raw:
 
@@ -291,45 +244,47 @@ class ScheduleService:
                 current_date = date(year, month, day_number)
 
                 is_time_off = False
-                is_work = False
-
-                if (emp["id"], current_date) in shift_set:
-                    is_work = True
 
                 if emp["id"] in time_off_map:
+
                     for start, end in time_off_map[emp["id"]]:
+
                         if start <= current_date <= end:
                             is_time_off = True
-                            is_work = False
                             break
 
-                if d["staff_from"] is None:
-                    emp_row["days"][day_number] = {
-                        "staff_from": None,
-                        "store_close": None,
-                        "is_time_off": is_time_off,
-                        "is_work": is_work
-                   }
-                    continue
+                shift = shift_map.get((emp["id"], current_date))
+                is_work = shift is not None
 
-                emp_row["days"][day_number] = {
-                    "staff_from": str(d["staff_from"])[:5],
-                    "store_close": str(d["store_close"])[:5],
+                if is_time_off:
+                    is_work = False
+
+                cell = {
+                    "staff_from": d["staff_from"],
+                    "store_close": d["store_close"],
                     "is_time_off": is_time_off,
                     "is_work": is_work
                 }
 
+                if shift:
+
+                    cell["start"] = shift["start_time"]
+                    cell["end"] = shift["end_time"]
+
+                emp_row["days"][day_number] = cell
+
             employees.append(emp_row)
-            cur.close()
+
+        cur.close()
+
         return {
             "days": days,
             "employees": employees
         }
 
-    from app import db
-    from app.services.schedule_day_service import ScheduleDayService
-
-
+    # --------------------------------------------------
+    # EDYCJA GODZIN DNIA
+    # --------------------------------------------------
     def update_day_hours(self, schedule_id, day, staff_from, store_close):
 
         day_service = ScheduleDayService(self.db)
@@ -341,7 +296,9 @@ class ScheduleService:
             store_close
         )
 
-
+    # --------------------------------------------------
+    # EDYCJA ZMIANY
+    # --------------------------------------------------
     def edit_shift(self, shift_id, start, end):
 
         cur = self.db.cursor()
