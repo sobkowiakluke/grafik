@@ -1,4 +1,5 @@
-
+from datetime import date
+from app.db.provider import get_db
 from calendar import monthrange
 from datetime import datetime, date
 
@@ -348,3 +349,41 @@ class ScheduleService:
             result[r["employee_id"]] = f"{hours}:{minutes:02d}"
 
         return result
+
+
+    def add_shift(self, schedule_id, employee_id, day, start, end):
+
+        from datetime import date
+        from app.db.provider import get_db
+
+        schedule = self.get_schedule(schedule_id)
+
+        shift_date = date(schedule["year"], schedule["month"], int(day))
+
+        db = get_db()
+        cur = db.cursor()
+
+        print("INSERTING:", schedule_id, employee_id, shift_date, start, end)
+
+        cur.execute("""
+            INSERT INTO shifts (
+                schedule_id,
+                employee_id,
+                shift_date,
+                start_time,
+                end_time
+            )
+            VALUES (%s,%s,%s,%s,%s)
+        """, (
+            schedule_id,
+            employee_id,
+            shift_date,
+            start,
+            end
+        ))
+
+        print("ROWCOUNT:", cur.rowcount)
+
+        db.commit()
+
+        cur.close()

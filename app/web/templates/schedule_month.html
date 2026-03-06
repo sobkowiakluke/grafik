@@ -57,48 +57,54 @@
 
             {% set cell = emp.days[d["day"]] %}
 
-            <td class="
-                {% if cell.is_time_off %}
-                time-off
-                {% elif cell.is_work %}
-                    work-day
+
+
+        <td class="
+            {% if cell.is_time_off %}
+            time-off
+            {% elif cell.is_work %}
+                work-day
+            {% endif %}
+        ">
+
+        {% if cell.is_time_off %}
+            <a class="cell-link"
+               href="{{ url_for(
+                    'schedule_bp.schedule_details',
+                    schedule_id=schedule.id,
+                    edit_time_off=emp.id ~ '-' ~ d['day']
+               ) }}">
+            </a>
+
+        {% elif cell.is_work %}
+            <a class="cell-link"
+               href="{{ url_for(
+                    'schedule_bp.schedule_details',
+                    schedule_id=schedule.id,
+                    edit_shift=emp.id ~ '-' ~ d['day']
+               ) }}">
+
+                {% if cell.start %}
+                    {{ "%02d:%02d"|format(cell.start.seconds // 3600, (cell.start.seconds // 60) % 60) }}
+                    -
+                    {{ "%02d:%02d"|format(cell.end.seconds // 3600, (cell.end.seconds // 60) % 60) }}
                 {% endif %}
-            ">
- 
-                {% if cell.is_time_off %}
-                    <a class="cell-link"
-                       href="{{ url_for(
-                            'schedule_bp.schedule_details',
-                            schedule_id=schedule.id,
-                            edit_time_off=emp.id ~ '-' ~ d['day']
-                       ) }}">
-                    </a>
 
-                {% elif cell.is_work %}
-                    <a class="cell-link"
-                       href="{{ url_for(
-                            'schedule_bp.schedule_details',
-                            schedule_id=schedule.id,
-                            edit_shift=emp.id ~ '-' ~ d['day']
-                       ) }}">
+            </a>
 
-                        {% if cell.start %}
-                            {{ "%02d:%02d"|format(cell.start.seconds // 3600, (cell.start.seconds // 60) % 60) }}
-                            -
-                            {{ "%02d:%02d"|format(cell.end.seconds // 3600, (cell.end.seconds // 60) % 60) }}
-                        {% endif %}
+        {% else %}
+            <a class="cell-link"
+               href="{{ url_for(
+                    'schedule_bp.schedule_details',
+                    schedule_id=schedule.id,
+                    add_shift=emp.id ~ '-' ~ d['day']
+               ) }}">
+            </a>
+        {% endif %}
 
-                    </a>
-                {% endif %}
-
-    </td>
+        </td>
 
 {% endfor %}
-
-
-
-
-
     </tr>
     {% endfor %}
 
@@ -253,10 +259,41 @@
 </a>
 
 {% endif %}
-
-
-
 <div id="inline-editor"></div>
 
+{% if add_shift %}
+<hr>
 
+<h5>
+Nowa zmiana —
+pracownik {{ add_emp_id }}
+(dzień {{ add_day }})
+</h5>
+<form method="post"
+      action="{{ url_for('schedule_bp.schedule_details',
+                         schedule_id=schedule.id,
+                         add_shift=add_emp_id ~ '-' ~ add_day) }}">
+
+    <input type="hidden" name="employee_id" value="{{ add_emp_id }}">
+    <input type="hidden" name="day" value="{{ add_day }}">
+
+    <div>
+        <label>Start:</label>
+        <input type="time" name="start">
+    </div>
+
+    <div>
+        <label>Koniec:</label>
+        <input type="time" name="end">
+    </div>
+
+    <button type="submit">Dodaj zmianę</button>
+
+</form>
+<a href="{{ url_for('schedule_bp.schedule_details',
+                    schedule_id=schedule.id) }}">
+Anuluj
+</a>
+
+{% endif %}
 

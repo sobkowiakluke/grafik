@@ -57,10 +57,21 @@ def schedule_details(schedule_id):
     edit_day = request.args.get("edit_day", type=int)
     edit_time_off = request.args.get("edit_time_off")
     edit_shift = request.args.get("edit_shift")
+    edit_day = request.args.get("edit_day", type=int)
+    edit_time_off = request.args.get("edit_time_off")
+    edit_shift = request.args.get("edit_shift")
+    add_shift = request.args.get("add_shift")
+
+    add_emp_id = None
+    add_day = None
 
     shift_emp_id = None
     shift_day = None
     shift = None
+
+    if add_shift:
+        add_emp_id, add_day = map(int, add_shift.split("-"))
+
 
     if edit_shift:
         parts = edit_shift.split("-")
@@ -204,6 +215,30 @@ def schedule_details(schedule_id):
             cur.close()
 
     # =====================================
+    # DODANIE ZMIANY
+    # =====================================
+
+    if request.method == "POST" and add_shift:
+
+        employee_id = int(request.form["employee_id"])
+        day = int(request.form["day"])
+        start = request.form["start"]
+        end = request.form["end"]
+
+        service.add_shift(
+            schedule_id=schedule_id,
+            employee_id=employee_id,
+            day=day,
+            start=start,
+            end=end
+        )
+
+        return redirect(url_for(
+            "schedule_bp.schedule_details",
+            schedule_id=schedule_id
+        ))
+
+    # =====================================
     # RENDER
     # =====================================
     return render_template(
@@ -222,6 +257,9 @@ def schedule_details(schedule_id):
         time_off=time_off,
         reasons=reasons,
         shift=shift,
+        add_shift=add_shift,
+        add_emp_id=add_emp_id,
+        add_day=add_day,
     )
 
 
@@ -317,3 +355,6 @@ def schedule_day(schedule_id, day):
         matrix=matrix,
         day=day
     )
+
+
+
